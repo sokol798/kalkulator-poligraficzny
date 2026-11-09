@@ -1,0 +1,114 @@
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+import { BookmarkIcon, DownloadIcon, ShareIcon } from '@/components/icons';
+import { SheetPreview } from '@/components/sheet-preview';
+import { TextField } from '@/components/text-field';
+import { Card, IconButton, KV, Label, PillButton, Screen, StackHeader, Text } from '@/components/ui';
+import { orientationLabel } from '@/features/calculator/calculator-screen';
+import { summaryOf } from '@/features/calculator/use-auto-save';
+import { useCalculation } from '@/hooks/use-calculation';
+import { useUnit } from '@/hooks/use-unit';
+import { t } from '@/i18n/pl';
+import { exportCardPdf, shareCard } from '@/lib/export';
+import { fmtDate, fmtDec, fmtInt } from '@/lib/format';
+import { useAppStore } from '@/store/app-store';
+import { spacing } from '@/theme/tokens';
+import { useTheme } from '@/theme/use-theme';
+
+export function CardScreen() {
+  const theme = useTheme();
+  const unit = useUnit();
+  const inputs = useAppStore((s) => s.inputs);
+  const { saveCurrent, toggleStar, renameEntry, newCalculation } = useAppStore();
+  const entry = useAppStore((s) => (s.currentEntryId ? s.history.find((h) => h.id === s.currentEntryId) : undefined));
+  const calc = useCalculation();
+  const [name, setName] = useState(entry?.name ?? '');
+  const when = entry?.createdAt ?? Date.now();
+
+  const persistName = () => {
+    const id = saveCurrent(summaryOf(calc), { name });
+    renameEntry(id, name);
+  };
+  const onStar = () => {
+    const id = saveCurrent(summaryOf(calc), entry ? { name } : { name, star: true });
+    if (entry) toggleStar(id);
+  };
+  const ensureSaved = () => saveCurrent(summaryOf(calc), { name });
+
+  const best = calc.imposition.best;
+  const onSheet = best ? `${calc.ups} · ${best.columns} × ${best.rows} · ${orientationLabel(best.strategy === 'grid-landscape' ? 'landscape' : best.strategy === 'grid-portrait' ? 'portrait' : 'auto').toLowerCase()}` : '—';
+
+  return (
+    <Screen
+      header={
+        <StackHeader
+          title={t.card.title}
+          right={
+            <IconButton accessibilityLabel={t.calc.save} onPress={onStar}>
+              <BookmarkIcon color={theme.ink} filled={!!entry?.starred} />
+            </IconButton>
+          }
+        />
+      }>
+      <Card style={{ gap: 14 }}>
+        <View style={{ gap: spacing.xs }}>
+          <Label>{t.card.name}</Label>
+          <TextField value={name} onChangeText={setName} onBlur={persistName} placeholder={t.history.untitled(calc.formatName)} accessibilityLabel={t.card.name} />
+        </View>
+        <View style={styles.top}>
+          <SheetPreview result={calc.imposition} maxWidth={150} maxHeight={210} numbered />
+          <View style={{ flex: 1, gap: spacing.md }}>
+            <View>
+              <Label>{t.card.sheets(calc.sheet.name)}</Label>
+              <Text variant="heroSmall">{calc.ups ? fmtInt(calc.sheets) : '—'}</Text>
+            </View>
+            <Stat label={t.card.quantity} value={`${fmtInt(inputs.quantity)} ${t.common.pcs}`} />
+            <Stat label={t.card.onSheet} value={onSheet} />
+            <Stat label={t.card.paper} value={`${inputs.grammage} g/m² · ${fmtDec(calc.totalWeightKg, 1)} kg`} />
+          </View>
+        </View>
+      </Card>
+
+      <Card style={{ paddingVertical: 4, gap: 0 }}>
+        <KV label={t.card.netFormat} value={`${unit.fmtSize(inputs.width, inputs.height)} (${calc.formatName})`} />
+        <KV label={t.card.withBleed(unit.fmtWithUnit(inputs.bleed))} value={unit.fmtSize(calc.itemWithBleed.width, calc.itemWithBleed.height)} />
+        <KV label={t.card.sheetGripper} value={`${calc.sheet.name} ${unit.fmtSize(calc.sheet.size.width, calc.sheet.size.height, false)} · ${unit.fmtWithUnit(calc.sheet.gripper)}`} />
+        <KV label={t.card.utilLast} value={`${calc.utilization} % · ${t.card.lastSheet(calc.lastSheetUps)}`} />
+        <KV label={t.card.sheetsWeight(calc.sheets, fmtDec(calc.sheetWeightG, 1))} value={`${fmtDec(calc.totalWeightKg, 1)} kg`} />
+        <KV label={t.card.pieceWeight} value={`${fmtDec(calc.pieceWeightG, 1)} g / ${fmtDec(calc.runWeightKg, 1)} kg`} />
+        <KV label={t.card.date} value={fmtDate(when)} last />
+      </Card>
+
+      <View style={styles.actions}>
+        <PillButton kind="secondary" title={t.card.pdf} icon={<DownloadIcon color={theme.ink} />} style={{ flex: 1 }} onPress={() => { ensureSaved(); void exportCardPdf(name, inputs, calc); }} />
+        <PillButton kind="secondary" title={t.card.share} icon={<ShareIcon color={theme.ink} />} style={{ flex: 1 }} onPress={() => { ensureSaved(); void shareCard(name, inputs, calc); }} />
+      </View>
+
+      <PillButton
+        title={t.card.newCalc}
+        onPress={() => {
+          newCalculation();
+          router.dismissAll();
+          router.replace('/');
+        }}
+        style={{ marginTop: spacing.md }}
+      />
+    </Screen>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <View>
+      <Label>{label}</Label>
+      <Text variant="value">{value}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  top: { flexDirection: 'row', gap: spacing.lg, alignItems: 'flex-start' },
+  actions: { flexDirection: 'row', gap: spacing.sm },
+});

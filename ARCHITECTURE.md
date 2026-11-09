@@ -18,39 +18,41 @@ Prosty, profesjonalny kalkulator dla drukarni: **ile użytków mieści się na a
 ```
 print-calc/
 ├── package.json                 # workspaces + skrypty zbiorcze
-├── ARCHITECTURE.md              # ten dokument
-├── packages/core/               # @printcalc/core – silnik obliczeniowy
+├── ARCHITECTURE.md
+├── packages/core/               # @printcalc/core – silnik obliczeniowy (bez zależności)
 │   ├── src/
 │   │   ├── types.ts             # model domenowy (Size, ImpositionInput, Layout, …)
-│   │   ├── formats.ts           # biblioteka formatów (A/B/C/RA/SRA/US + handlowe), presety produktów
-│   │   ├── imposition.ts        # algorytm układania użytków (siatka + układ mieszany/gilotynowy)
-│   │   ├── sheets.ts            # arkusze na nakład, naddatek, papier (masa, koszt), broszura, grzbiet
-│   │   ├── compare.ts           # porównanie formatów arkusza pod kątem zużycia papieru
-│   │   ├── units.ts             # jednostki, zaokrąglanie, formatowanie wymiarów
-│   │   └── index.ts
+│   │   ├── formats.ts           # formaty ISO (A/B/C/RA/SRA/US) i handlowe
+│   │   ├── imposition.ts        # układanie użytków: siatka + układ mieszany (gilotynowy)
+│   │   ├── sheets.ts            # arkusze na nakład, papier (masa/koszt), broszury, grzbiet
+│   │   ├── compare.ts           # porównanie formatów arkusza
+│   │   └── units.ts, index.ts
 │   └── tests/                   # 26 testów (Vitest)
 └── apps/app/                    # @printcalc/app – Expo (iOS / Android / web)
-    ├── app.json                 # konfiguracja Expo (nazwa, bundle id, ikony, web static)
-    ├── eas.json                 # profile buildów EAS (development / preview / production)
+    ├── app.json, eas.json
     └── src/
-        ├── app/                 # TRASY (Expo Router): _layout.tsx = zakładki; index, compare, booklet, settings
-        ├── features/            # ekrany pogrupowane funkcjonalnie
-        │   ├── imposition/calculator-screen.tsx
-        │   ├── compare/compare-screen.tsx
-        │   ├── booklet/booklet-screen.tsx
-        │   └── settings/settings-screen.tsx
-        ├── components/          # komponenty wielokrotnego użytku
-        │   ├── ui.tsx           # Screen, Card, Row, ResultRow, StatTile, Button, Segmented, SwitchRow, Notice
-        │   ├── number-field.tsx # pole liczbowe (przecinek/kropka, walidacja, jednostka)
-        │   ├── size-field.tsx   # szer. × wys. + obrót + preset
-        │   ├── preset-picker.tsx# modal z listą formatów (grupy, wyszukiwarka)
-        │   └── sheet-preview.tsx# rysunek arkusza w SVG
-        ├── store/calculator-store.ts  # zustand: dane wejściowe, broszura, ustawienia domyślne
-        ├── hooks/use-calculation.ts   # łączy store z silnikiem (memo)
-        ├── theme/tokens.ts      # ★ JEDYNE miejsce z kolorami, odstępami, typografią, promieniami
-        ├── theme/use-theme.ts
-        ├── i18n/pl.ts           # wszystkie teksty UI
-        └── global.css           # fonty / reset dla web
+        ├── app/                 # TRASY (Expo Router)
+        │   ├── _layout.tsx      # Stack: zakładki + ekrany podrzędne i arkusze dolne (formSheet)
+        │   ├── (tabs)/          # index (Kalkulator), library (Biblioteka), history (Historia)
+        │   ├── pick-format.tsx  # arkusz dolny: wybór formatu
+        │   ├── pick-sheet.tsx   # arkusz dolny: wybór arkusza (użytki · arkusze przy każdym)
+        │   ├── card.tsx         # karta zlecenia (PDF / udostępnij)
+        │   ├── new-format.tsx, new-sheet.tsx
+        │   └── settings.tsx, help.tsx
+        ├── features/            # ekrany pogrupowane funkcjonalnie (calculator, pickers, card, library, history, settings, help)
+        ├── components/
+        │   ├── ui.tsx           # Screen, TabHeader, StackHeader, Card, Chip, PillButton, Segmented, Row, KV, ListItem, Toggle
+        │   ├── number-field.tsx, text-field.tsx
+        │   ├── sheet-preview.tsx# rysunek arkusza w SVG (z numeracją na karcie)
+        │   ├── tab-bar.tsx      # pływający pasek zakładek (pigułka)
+        │   └── icons.tsx        # ikony liniowe z makiet
+        ├── store/app-store.ts   # zustand+persist: wejścia, biblioteka, historia, ustawienia
+        ├── hooks/use-calculation.ts, use-unit.ts
+        ├── lib/library-data.ts  # wbudowane arkusze (B2, B1, A2+, B3, 640×900, SRA3, SRA3+, A3) i formaty
+        ├── lib/export.ts        # PDF karty (expo-print), udostępnianie, CSV historii
+        ├── lib/format.ts        # formatowanie liczb i dat (pl-PL)
+        ├── theme/tokens.ts      # ★ paleta (jasna/ciemna), odstępy, promienie, typografia (Inter)
+        └── i18n/pl.ts           # wszystkie teksty UI
 ```
 
 ## 3. Model domenowy (słownik)
@@ -61,7 +63,7 @@ print-calc/
 | Spad | `bleed` | Naddatek grafiki na każdą krawędź; użytek brutto = netto + 2×spad. |
 | Odstęp | `gutter` | Przerwa między użytkami brutto (np. na znaczniki cięcia). Ostatni użytek w rzędzie nie potrzebuje odstępu. |
 | Arkusz | `sheet` | Arkusz drukowy (np. B1 707×1000, SRA3 320×450). |
-| Łapka | `margins.top` | Pas chwytu maszyny, nie do zadruku. |
+| Chwyt (łapka) | `margins.top` | Pas chwytu maszyny, nie do zadruku. W aplikacji przypisany do arkusza. |
 | Marginesy | `margins.*` | Pozostałe pasy nie do zadruku. Obszar zadruku = arkusz − marginesy. |
 | Układ | `Layout` | Konkretne rozmieszczenie: strategia, kolumny × wiersze, lista pozycji, wykorzystanie, resztki. |
 | Nakład | `quantity` | Liczba egzemplarzy do wydrukowania. |
@@ -94,14 +96,21 @@ UI (ekrany) ──set()──▶ zustand store (inputs) ──persist──▶ A
 
 Wyniki nie są przechowywane – zawsze wyliczane z wejścia, więc nie ma stanu niespójnego.
 
-## 6. Ekrany
+## 6. Ekrany (wg makiet „styl 8”)
 
 | Trasa | Ekran | Zawartość |
 |---|---|---|
-| `/` | Kalkulator | Użytek → Arkusz → Wynik (użytki, podgląd, warianty) → Papier (arkusze, naddatek, masa, koszt). Jeden przewijany formularz, wszystko przelicza się na żywo. |
-| `/compare` | Formaty | Tabela: dla bieżącego użytku każdy format arkusza → użytki, arkusze brutto, zużycie papieru (m²), wykorzystanie. Przycisk „Użyj” podstawia format. |
-| `/booklet` | Broszura | Strony → składki, wakaty, grubość grzbietu. |
-| `/settings` | Ustawienia | Wartości domyślne nowego obliczenia (spad, łapka, naddatek, gramatura…). |
+| `/` | Kalkulator | Chipy formatów (A5/A4/A6/DL/Więcej), szer. × wys., nakład ze stepperem ±100, chipy arkuszy (B2/B1/Więcej), gramatura (80/130/170/300/inna), linia „Spady · chwyt · orientacja · Zmień”, wynik na żywo (arkusze, użytki, %, masa) z miniaturą arkusza i przełącznikiem orientacji (Auto·9 / Pion·9 / Poziom·8), przyciski „Karta zlecenia” i zapis do historii. |
+| `/pick-format` | Wybierz format | Arkusz dolny: szukaj, ostatnio używane, moje, seria A, seria B, inne, „Własny wymiar” → nowy format. |
+| `/pick-sheet` | Wybierz arkusz | Arkusz dolny: Offset / Cyfra, przy każdym arkuszu użytki i liczba arkuszy dla bieżącego nakładu; własny arkusz (szer., wys., chwyt). |
+| `/card` | Karta zlecenia | Nazwa, numerowany rozkład użytków, arkusze/nakład/na arkuszu/papier, tabela szczegółów, PDF i udostępnianie, „Nowe obliczenie”. |
+| `/library` | Biblioteka | Segment Formaty (szukaj, Moje, Standardowe, Użyj) / Arkusze (Offset, Cyfra, Domyślny/Użyj, +). |
+| `/new-format`, `/new-sheet` | Nowy format / arkusz | Wymiar, nazwa, spady lub chwyt i margines, podgląd „Na B2 zmieści się N”, „Zapisz i użyj” / „Zapisz”. Edycja własnych pozycji przez tę samą trasę z `id`. |
+| `/history` | Historia | Wszystkie / Zapisane ★, grupy Dzisiaj / Wczoraj / Wcześniej, duża liczba arkuszy, „Powtórz”, tap → karta. |
+| `/settings` | Ustawienia | Spady, chwyt, gramatura, arkusz domyślny, orientacja; zaokrąglanie (w górę / do 10), auto-zapis historii, jednostka mm/cm; pomoc i eksport CSV. |
+| `/help` | Jak liczymy | Krótkie wyjaśnienie algorytmu. |
+
+Stan ekranu zapisywany jest lokalnie (AsyncStorage / localStorage); historia trzyma do 200 wpisów, auto-zapis nadpisuje bieżący wpis po 2 s od zmiany.
 
 ## 7. Warstwa wizualna – gdzie designer wprowadza zmiany
 
