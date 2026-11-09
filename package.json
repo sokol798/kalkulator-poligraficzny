@@ -1,0 +1,24 @@
+{
+  "name": "print-calc",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Kalkulator poligraficzny – użytki, arkusze, papier. iOS / Android / Web.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "core:test": "npm run test -w @printcalc/core",
+    "core:build": "npm run build -w @printcalc/core",
+    "app:start": "npm run start -w @printcalc/app",
+    "app:web": "npm run web -w @printcalc/app",
+    "app:ios": "npm run ios -w @printcalc/app",
+    "app:android": "npm run android -w @printcalc/app",
+    "app:export:web": "npm run export:web -w @printcalc/app",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
