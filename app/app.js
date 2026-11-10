@@ -285,6 +285,17 @@
   }
   function closeSheet() { if (sheetOverlay) { sheetOverlay.remove(); sheetOverlay = null; document.body.style.overflow = ''; } }
   const sheetHead = (title) => `<div class="hd"><h2>${title}</h2><button type="button" class="icobtn" data-close aria-label="Zamknij">${I.close}</button></div>`;
+  /** Potwierdzenie w arkuszu dolnym: systemowe okienka nie działają w każdym środowisku. */
+  function ask(msg, okLabel) {
+    return new Promise((resolve) => {
+      const el = openSheet(`${sheetHead('Na pewno?')}<p style="margin:4px 4px 12px;font-size:15px;line-height:22px">${esc(msg)}</p><div class="actions" style="margin:0"><button type="button" class="btn" id="askOk" style="background:#b42a18">${esc(okLabel || 'Usuń')}</button><button type="button" class="btn light auto" id="askNo">Anuluj</button></div>`);
+      const done = (v) => { closeSheet(); resolve(v); };
+      el.querySelector('[data-close]').addEventListener('click', () => done(false));
+      el.querySelector('#askNo').addEventListener('click', () => done(false));
+      el.querySelector('#askOk').addEventListener('click', () => done(true));
+      el.addEventListener('click', (e) => { if (e.target === el) resolve(false); });
+    });
+  }
 
   function openFormatSheet() {
     const render = (query) => {
@@ -430,7 +441,7 @@
     const list = app.querySelector('#list');
     const bind = () => {
       list.querySelectorAll('[data-use]').forEach((b) => b.addEventListener('click', () => { useFormat(formatById(b.dataset.use)); S.current.historyId = null; location.hash = '#/'; }));
-      list.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => { const f = formatById(b.dataset.del); if (!confirm(`Usunąć format „${f.name}”?`)) return; S.customFormats = S.customFormats.filter((x) => x.id !== f.id); S.recentFormats = S.recentFormats.filter((x) => x !== f.id); if (S.current.formatId === f.id) S.current.formatId = null; persist(); renderFormats(); }));
+      list.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => { const f = formatById(b.dataset.del); if (!await ask(`Usunąć format „${f.name}”?`)) return; S.customFormats = S.customFormats.filter((x) => x.id !== f.id); S.recentFormats = S.recentFormats.filter((x) => x !== f.id); if (S.current.formatId === f.id) S.current.formatId = null; persist(); renderFormats(); }));
     };
     bind();
     app.querySelector('#q').addEventListener('input', (e) => { list.innerHTML = render(e.target.value); bind(); });
@@ -449,7 +460,7 @@
       ${tabsHTML('lib')}
     </div>`;
     app.querySelectorAll('[data-def]').forEach((b) => b.addEventListener('click', () => { S.settings.defaultSheetId = b.dataset.def; useSheet(sheetById(b.dataset.def)); S.current.historyId = null; persist(); renderSheets(); toast(`${sheetById(b.dataset.def).name} jest arkuszem domyślnym`); }));
-    app.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => { const s = sheetById(b.dataset.del); if (!confirm(`Usunąć arkusz „${s.name}”?`)) return; S.customSheets = S.customSheets.filter((x) => x.id !== s.id); S.recentSheets = S.recentSheets.filter((x) => x !== s.id); if (S.settings.defaultSheetId === s.id) S.settings.defaultSheetId = 'b2'; if (S.current.sheetId === s.id) S.current.sheetId = S.settings.defaultSheetId; persist(); renderSheets(); }));
+    app.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => { const s = sheetById(b.dataset.del); if (!await ask(`Usunąć arkusz „${s.name}”?`)) return; S.customSheets = S.customSheets.filter((x) => x.id !== s.id); S.recentSheets = S.recentSheets.filter((x) => x !== s.id); if (S.settings.defaultSheetId === s.id) S.settings.defaultSheetId = 'b2'; if (S.current.sheetId === s.id) S.current.sheetId = S.settings.defaultSheetId; persist(); renderSheets(); }));
   }
 
   /* ---------- ekran: nowy / edycja formatu ---------- */
@@ -499,7 +510,7 @@
       };
       $('#save').addEventListener('click', () => { if (doSave()) { toast('Format zapisany'); location.hash = '#/biblioteka/formaty'; } });
       $('#saveUse').addEventListener('click', () => { const f = doSave(); if (f) { useFormat(f); S.current.historyId = null; location.hash = '#/'; } });
-      if (existing) $('#del').addEventListener('click', () => { if (!confirm(`Usunąć format „${existing.name}”?`)) return; S.customFormats = S.customFormats.filter((x) => x.id !== existing.id); persist(); location.hash = '#/biblioteka/formaty'; });
+      if (existing) $('#del').addEventListener('click', async () => { if (!await ask(`Usunąć format „${existing.name}”?`)) return; S.customFormats = S.customFormats.filter((x) => x.id !== existing.id); persist(); location.hash = '#/biblioteka/formaty'; });
     };
     draw();
   }
@@ -564,7 +575,7 @@
     </div>`;
     app.querySelectorAll('[data-f]').forEach((b) => b.addEventListener('click', () => { histFilter = b.dataset.f; renderHistory(); }));
     app.querySelectorAll('[data-repeat]').forEach((b) => b.addEventListener('click', () => { const h = S.history.find((x) => x.id === b.dataset.repeat); loadFromHistory(h); S.current.historyId = null; S.current.name = ''; persist(); location.hash = '#/'; }));
-    app.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => { S.history = S.history.filter((x) => x.id !== b.dataset.del); if (S.current.historyId === b.dataset.del) S.current.historyId = null; persist(); renderHistory(); }));
+    app.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => { if (!await ask('Usunąć to obliczenie z historii?')) return; S.history = S.history.filter((x) => x.id !== b.dataset.del); if (S.current.historyId === b.dataset.del) S.current.historyId = null; persist(); renderHistory(); }));
   }
 
   /* ---------- ekran: ustawienia ---------- */
@@ -608,7 +619,7 @@
     }));
     app.querySelector('#auto').addEventListener('click', () => { s.autoHistory = !s.autoHistory; persist(); renderSettings(); });
     app.querySelector('#csv').addEventListener('click', exportCSV);
-    app.querySelector('#reset').addEventListener('click', () => { if (!confirm('Usunąć całą historię oraz własne formaty i arkusze? Tej operacji nie można cofnąć.')) return; S.history = []; S.customFormats = []; S.customSheets = []; S.recentFormats = []; S.recentSheets = []; S.settings.defaultSheetId = 'b2'; S.current = Object.assign({}, Data.DEFAULT_CURRENT); persist(); toast('Wyczyszczono'); renderSettings(); });
+    app.querySelector('#reset').addEventListener('click', async () => { if (!await ask('Usunąć całą historię oraz własne formaty i arkusze? Tej operacji nie można cofnąć.', 'Wyczyść')) return; S.history = []; S.customFormats = []; S.customSheets = []; S.recentFormats = []; S.recentSheets = []; S.settings.defaultSheetId = 'b2'; S.current = Object.assign({}, Data.DEFAULT_CURRENT); persist(); toast('Wyczyszczono'); renderSettings(); });
   }
   function exportCSV() {
     if (!S.history.length) return toast('Historia jest pusta');
