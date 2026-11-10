@@ -72,3 +72,10 @@ node /Users/sokol/Desktop/Kalkulator/app/tests/calc.test.js
 
 Źródła w chmurze: makiety https://claude.ai/artifact/S5e4rsGPfPSx3hEvojcJCX,
 system projektowy https://claude.ai/artifact/JPovsZsyiKgrdqFV3PfQLq.
+
+## Wersja online
+
+Aplikacja jest opublikowana jako prywatna strona na claude.ai (udostępnianie z menu „Share” na stronie):
+https://claude.ai/artifact/UdVfRL71At49aY6m6fGV9F
+
+Biblioteka zawiera 86 formatów netto (serie A i B, ulotki, wizytówki, koperty, plakaty drukarskie, książki, kalendarze, foto, amerykańskie) oraz 26 arkuszy drukarskich (offset B/A/RA/SRA i cyfra).
