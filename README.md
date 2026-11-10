@@ -75,7 +75,17 @@ system projektowy https://claude.ai/artifact/JPovsZsyiKgrdqFV3PfQLq.
 
 ## Wersja online
 
-Aplikacja jest opublikowana jako prywatna strona na claude.ai (udostępnianie z menu „Share” na stronie):
-https://claude.ai/artifact/UdVfRL71At49aY6m6fGV9F
+Publiczny adres (GitHub Pages, gałąź `gh-pages` = zawartość folderu `app`):
+https://sokol798.github.io/kalkulator-poligraficzny/
+
+Aktualizacja po zmianach w `app/`:
+
+```bash
+git subtree push --prefix app origin gh-pages
+```
+
+Kopia prywatna na claude.ai: https://claude.ai/artifact/UdVfRL71At49aY6m6fGV9F
+
+Własna domena: po zakupie dodaj plik `app/CNAME` z nazwą domeny i w DNS rekord CNAME `www` → `sokol798.github.io` (lub rekordy A dla domeny głównej według dokumentacji GitHub Pages).
 
 Biblioteka zawiera 86 formatów netto (serie A i B, ulotki, wizytówki, koperty, plakaty drukarskie, książki, kalendarze, foto, amerykańskie) oraz 26 arkuszy drukarskich (offset B/A/RA/SRA i cyfra).
