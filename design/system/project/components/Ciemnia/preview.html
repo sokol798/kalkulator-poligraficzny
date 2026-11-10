@@ -1,0 +1,35 @@
+<!-- @dsCard group="Propozycje" height=420 width=560 subtitle="Propozycja 4 — ciemne narzędzie pro, Manrope, limonkowy akcent" -->
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;800&display=swap">
+<style>
+  html,body{margin:0;background:var(--p4-bg);color:var(--p4-ink);font-family:var(--font-manrope)}
+  .page{padding:var(--space-5);box-sizing:border-box;width:560px}
+  .card{background:var(--p4-surface);border:1px solid var(--p4-border);border-radius:var(--radius-md);padding:var(--space-5)}
+  h1{font:600 14px/20px var(--font-manrope);color:var(--p4-muted);margin:0 0 var(--space-4);display:flex;justify-content:space-between}
+  h1 span{color:var(--p4-accent)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
+  .field{background:var(--p4-bg);border:1px solid var(--p4-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3)}
+  .label{font-size:12px;line-height:16px;color:var(--p4-muted);font-weight:600}
+  .value{font-size:16px;line-height:24px;font-weight:600}
+  .value small{color:var(--p4-muted);font-weight:500}
+  .result{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--space-5);padding-top:var(--space-4);border-top:1px solid var(--p4-border)}
+  .big{font-size:48px;line-height:52px;font-weight:800;letter-spacing:-.02em;color:var(--p4-accent)}
+  .big small{font-size:14px;color:var(--p4-muted);margin-left:var(--space-2);font-weight:600;letter-spacing:0}
+  .sub{font-size:14px;line-height:20px;color:var(--p4-muted);margin-top:var(--space-1)}
+  .btn{background:var(--p4-accent);color:var(--p4-bg);border:0;border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font:800 14px/20px var(--font-manrope)}
+</style></head><body>
+<div class="page"><div class="card">
+  <h1>Kalkulator poligraficzny <span>● gotowy</span></h1>
+  <div class="grid">
+    <div class="field"><div class="label">Format netto</div><div class="value">210 × 297 <small>mm</small></div></div>
+    <div class="field"><div class="label">Spady</div><div class="value">3 <small>mm</small></div></div>
+    <div class="field"><div class="label">Arkusz drukarski</div><div class="value">B2 · 500 × 700 <small>mm</small></div></div>
+    <div class="field"><div class="label">Nakład</div><div class="value">1 000 <small>szt.</small></div></div>
+  </div>
+  <div class="result">
+    <div><div class="big">125<small>arkuszy</small></div><div class="sub">8 użytków na arkuszu · odpad 11 %</div></div>
+    <button class="btn">Przelicz</button>
+  </div>
+</div></div>
+</body></html>

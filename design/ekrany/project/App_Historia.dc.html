@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Aplikacja — Historia</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+body{margin:0;background:#eceff2;color:#111111;font-family:Inter,system-ui,sans-serif}
+a{color:#111111;text-decoration:none}a:hover{color:#5c6670}
+button{font-family:inherit}
+.lbl{font-size:13px;line-height:18px;color:#5c6670;font-weight:500}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#ffffff;border-radius:999px;padding:4px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:10px;font-size:14px;font-weight:500;color:#5c6670;min-height:40px}
+.seg button.on{background:#111111;color:#ffffff}
+.item{display:flex;align-items:center;gap:14px;background:#ffffff;border-radius:16px;padding:12px 16px;min-height:76px;box-sizing:border-box;color:#111111}
+.num{font-size:26px;font-weight:600;letter-spacing:-0.03em;min-width:56px}
+.sec{font-size:12px;font-weight:600;color:#5c6670;text-transform:uppercase;letter-spacing:.04em;margin:14px 4px 6px}
+.use{font-size:13px;font-weight:600;color:#111111;border:1px solid #dbe0e5;border-radius:999px;padding:8px 12px;min-height:36px;display:flex;align-items:center}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#ffffff;border-radius:20px;padding:6px;gap:2px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;font-size:11px;font-weight:500;color:#5c6670;min-height:52px;box-sizing:border-box;justify-content:center}
+.tab.on{background:#111111;color:#ffffff}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #eceff2; overflow: hidden; padding: 0 16px;">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 56px 0 12px;">
+    <span style="font-size: 20px; font-weight: 600;">Historia</span>
+    <span class="lbl">ostatnie 30 dni</span>
+  </header>
+
+  <div class="seg" role="group" aria-label="Filtr">
+    <button type="button" class="on">Wszystkie</button>
+    <button type="button">Zapisane ★</button>
+  </div>
+
+  <div class="sec">Dzisiaj</div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="item">
+      <span class="num">112</span>
+      <a href="App_Karta.dc.html" style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Ulotka A5 — Targi Poznań ★</span><span class="lbl">A5 · 1 000 szt. · B2 · 130 g · 5,1 kg</span></a>
+      <a href="App_Kalkulator.dc.html" class="use">Powtórz</a>
+    </div>
+    <div class="item">
+      <span class="num">24</span>
+      <a href="App_Karta.dc.html" style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Wizytówki — Kowalski</span><span class="lbl">90 × 50 · 500 szt. · SRA3 · 17:10</span></a>
+      <a href="App_Kalkulator.dc.html" class="use">Powtórz</a>
+    </div>
+  </div>
+
+  <div class="sec">Wczoraj</div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="item">
+      <span class="num">334</span>
+      <a href="App_Karta.dc.html" style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Plakat A3 — koncert</span><span class="lbl">A3 · 2 000 szt. · B1 · 14:31</span></a>
+      <a href="App_Kalkulator.dc.html" class="use">Powtórz</a>
+    </div>
+    <div class="item">
+      <span class="num">63</span>
+      <a href="App_Karta.dc.html" style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Ulotka DL ★</span><span class="lbl">DL · 1 000 szt. · B2 · 09:05</span></a>
+      <a href="App_Kalkulator.dc.html" class="use">Powtórz</a>
+    </div>
+  </div>
+
+  <div class="sec">Wcześniej</div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="item">
+      <span class="num">8</span>
+      <a href="App_Karta.dc.html" style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Zaproszenie kwadrat</span><span class="lbl">150 × 150 · 120 szt. · SRA3 · pon.</span></a>
+      <a href="App_Kalkulator.dc.html" class="use">Powtórz</a>
+    </div>
+  </div>
+
+  <nav class="tabs" style="margin-top: auto; margin-bottom: 20px;" aria-label="Nawigacja">
+    <a href="App_Kalkulator.dc.html" class="tab"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2" width="12" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h6M6 9.5h2M10 9.5h2M6 13h2M10 13h2" stroke="currentColor" stroke-width="1.5"/></svg>Kalkulator</a>
+    <a href="App_Formaty.dc.html" class="tab"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 9h13M9 2.5v13" stroke="currentColor" stroke-width="1.5"/></svg>Biblioteka</a>
+    <a href="App_Historia.dc.html" class="tab on"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Historia</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

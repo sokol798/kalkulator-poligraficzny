@@ -1,0 +1,25 @@
+{
+  "v": 3,
+  "assetGroups": {},
+  "blobs": {},
+  "createdOnFiles": {
+    "at": "2026-11-09T18:37:34Z",
+    "v": 1
+  },
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "groups": [],
+  "lastChange": {
+    "at": "2026-11-09T18:37:34Z",
+    "by": "Jerzy",
+    "note": "Pięć propozycji stylu kalkulatora poligraficznego do wyboru.",
+    "via": "Cowork"
+  },
+  "layout": "files",
+  "libraries": [],
+  "namespace": "KalkulatorPoligraficzny",
+  "sections": {},
+  "title": "Kalkulator poligraficzny"
+}

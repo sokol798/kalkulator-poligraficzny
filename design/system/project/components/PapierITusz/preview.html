@@ -1,0 +1,34 @@
+<!-- @dsCard group="Propozycje" height=420 width=560 subtitle="Propozycja 1 — redakcyjna, Fraunces + Inter, czerwień pasera" -->
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500&display=swap">
+<style>
+  html,body{margin:0;background:var(--p1-bg);color:var(--p1-ink);font-family:var(--font-sans)}
+  .page{padding:var(--space-5);box-sizing:border-box;width:560px}
+  .card{background:var(--p1-surface);border:1px solid var(--p1-hairline);border-radius:var(--radius-sm);padding:var(--space-5)}
+  h1{font-family:var(--font-serif);font-weight:500;font-size:22px;line-height:28px;margin:0 0 var(--space-5)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-5)}
+  .field{padding:var(--space-3) 0;border-bottom:1px solid var(--p1-hairline)}
+  .label{font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--p1-muted);font-weight:500}
+  .value{font-size:17px;line-height:24px;font-weight:500;margin-top:var(--space-1)}
+  .value small{color:var(--p1-muted);font-weight:400}
+  .result{display:flex;align-items:flex-end;justify-content:space-between;margin-top:var(--space-5)}
+  .big{font-family:var(--font-serif);font-size:48px;line-height:52px;font-weight:600;color:var(--p1-accent)}
+  .big small{font-size:17px;font-family:var(--font-sans);font-weight:400;color:var(--p1-muted);margin-left:var(--space-2)}
+  .sub{color:var(--p1-muted);font-size:14px;line-height:20px;margin-top:var(--space-1)}
+  .btn{background:var(--p1-accent);color:#fff;border:0;border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4);font:500 14px/20px var(--font-sans)}
+</style></head><body>
+<div class="page"><div class="card">
+  <h1>Kalkulator poligraficzny</h1>
+  <div class="grid">
+    <div class="field"><div class="label">Format netto</div><div class="value">210 × 297 <small>mm</small></div></div>
+    <div class="field"><div class="label">Spady</div><div class="value">3 <small>mm</small></div></div>
+    <div class="field"><div class="label">Arkusz drukarski</div><div class="value">B2 · 500 × 700 <small>mm</small></div></div>
+    <div class="field"><div class="label">Nakład</div><div class="value">1 000 <small>szt.</small></div></div>
+  </div>
+  <div class="result">
+    <div><div class="big">125<small>arkuszy</small></div><div class="sub">8 użytków na arkuszu · marnotrawstwo 11 %</div></div>
+    <button class="btn">Przelicz</button>
+  </div>
+</div></div>
+</body></html>

@@ -1,0 +1,34 @@
+{
+  "v": 3,
+  "attachments": {},
+  "createdOnFiles": { "v": 1, "at": "2026-11-09T18:45:00Z" },
+  "title": "Kalkulator poligraficzny — ekrany",
+  "launch": { "view": "canvas" },
+  "pages": [{ "id": "app", "name": "Aplikacja — styl 8" }],
+  "boards": {
+    "App_Kalkulator.dc.html": { "x": 0, "y": 0, "w": 390, "h": 844, "title": "1 · Kalkulator (wynik na żywo)", "radius": 44, "page": "app", "is_interactive": true },
+    "App_WyborFormatu.dc.html": { "x": 470, "y": 0, "w": 390, "h": 844, "title": "1a · Więcej formatów (arkusz dolny)", "radius": 44, "page": "app", "is_interactive": true },
+    "App_WyborArkusza.dc.html": { "x": 940, "y": 0, "w": 390, "h": 844, "title": "1b · Więcej arkuszy (arkusz dolny)", "radius": 44, "page": "app", "is_interactive": true },
+    "App_Karta.dc.html": { "x": 1410, "y": 0, "w": 390, "h": 844, "title": "2 · Karta zlecenia", "radius": 44, "page": "app", "is_interactive": true },
+    "App_Formaty.dc.html": { "x": 1880, "y": 0, "w": 390, "h": 844, "title": "3 · Biblioteka — Formaty", "radius": 44, "page": "app", "is_interactive": true },
+    "App_Arkusze.dc.html": { "x": 2350, "y": 0, "w": 390, "h": 844, "title": "3b · Biblioteka — Arkusze", "radius": 44, "page": "app", "is_interactive": true },
+    "App_NowyFormat.dc.html": { "x": 2820, "y": 0, "w": 390, "h": 844, "title": "4 · Nowy format", "radius": 44, "page": "app", "is_interactive": true },
+    "App_Historia.dc.html": { "x": 3290, "y": 0, "w": 390, "h": 844, "title": "5 · Historia", "radius": 44, "page": "app", "is_interactive": true },
+    "App_Ustawienia.dc.html": { "x": 3760, "y": 0, "w": 390, "h": 844, "title": "6 · Ustawienia", "radius": 44, "page": "app", "is_interactive": true }
+  },
+  "order": ["App_Kalkulator.dc.html", "App_WyborFormatu.dc.html", "App_WyborArkusza.dc.html", "App_Karta.dc.html", "App_Formaty.dc.html", "App_Arkusze.dc.html", "App_NowyFormat.dc.html", "App_Historia.dc.html", "App_Ustawienia.dc.html"],
+  "noteOrder": ["title", "apptitle"],
+  "notes": {
+    "title": { "kind": "title1", "maxW": 6720, "text": "Kalkulator poligraficzny ", "w": 240, "x": 0, "y": -300 },
+    "apptitle": { "kind": "title1", "maxW": 3210, "page": "app", "text": "", "w": 240, "x": 0, "y": -300 }
+  },
+  "designSystems": [
+    {
+      "title": "Kalkulator poligraficzny",
+      "namespace": "kalkulatorpoligraficzny",
+      "artifact": "https://claude.ai/code/artifact/8cdaa41d-89d7-4264-9fbd-bf09c646b54a",
+      "version": "1794249650-959b",
+      "copiedAt": "2026-11-09T18:45:00Z"
+    }
+  ]
+}
