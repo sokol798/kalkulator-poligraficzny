@@ -452,7 +452,7 @@
           <div class="stack" style="flex:1">
             <div><div class="lbl">Arkuszy ${esc(sh.name)}</div><div style="font-size:48px;line-height:1;font-weight:600;letter-spacing:-.04em;margin-top:2px">${nf0.format(r.sheets)}</div></div>
             <div><div class="lbl">Nakład · ilość szt.</div><div style="font-size:17px;font-weight:600">${nf0.format(r.quantity)} szt.</div></div>
-            <div><div class="lbl">Na arkuszu · użytki</div><div style="font-size:17px;font-weight:600">${lay.cols} × ${lay.rows} · ${r.perSheet} szt. <span class="lbl" style="font-weight:500">${orientPl}</span></div></div>
+            <div><div class="lbl">Na arkuszu · użytki</div><div style="font-size:17px;font-weight:600">${r.perSheet} szt. <span class="lbl" style="font-weight:500">${orientPl}</span></div></div>
             <div><div class="lbl">Papier · waga arkuszy</div><div style="font-size:17px;font-weight:600">${kg(r.weight.sheetsTotal)} <span class="lbl" style="font-weight:500">${r.grammage} g/m²</span></div></div>
           </div>
         </div>
@@ -491,7 +491,7 @@
       `Format netto: ${c.formatId ? `${formatLabel()} (${dims(r.layout.gross.w, r.layout.gross.h)})` : dims(r.layout.gross.w, r.layout.gross.h)}, ze spadami +${dim(c.bleed)} ${unit()}`,
       `Nakład: ${nf0.format(r.quantity)} szt.`,
       `Arkusz netto: ${sh.name} (${dims(sh.w, sh.h)}), ${sh.gripper ? 'z chwytem' : 'z marginesem'} +${dim(sh.gripper || sh.margin)} ${unit()}`,
-      `Na arkuszu: ${r.perSheet} (${r.layout.chosen.cols} × ${r.layout.chosen.rows}), wykorzystanie ${nf0.format(r.utilization * 100)} %`,
+      `Na arkuszu: ${r.perSheet} szt. ${r.layout.chosen.orientation === 'portrait' ? 'pion' : 'poziom'}, wykorzystanie ${nf0.format(r.utilization * 100)} %`,
       `Arkuszy: ${nf0.format(r.sheets)} (ostatni: ${r.lastSheet})`,
       `Papier: ${r.grammage} g/m², waga arkuszy ${kg(r.weight.sheetsTotal)}`,
     ].join('\n');
