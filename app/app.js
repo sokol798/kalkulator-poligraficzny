@@ -281,9 +281,9 @@
         </div>
         <div class="card stack8">
           <span class="lbl">Orientacja użytku</span>
-          <div class="seg" role="group" aria-label="Orientacja użytku">
-            <button type="button" class="${c.orientation === 'portrait' ? 'on' : ''}" data-orient="portrait">Pion</button>
-            <button type="button" class="${c.orientation === 'landscape' ? 'on' : ''}" data-orient="landscape">Poziom</button>
+          <div class="chips" role="group" aria-label="Orientacja użytku">
+            <button type="button" class="chip wide ${c.orientation === 'portrait' ? 'on' : ''}" data-orient="portrait">Pion</button>
+            <button type="button" class="chip wide ${c.orientation === 'landscape' ? 'on' : ''}" data-orient="landscape">Poziom</button>
           </div>
           ${hint('Jak obrócić użytek na arkuszu: pion – jak format, poziom – obrócony o 90°.')}
         </div>
