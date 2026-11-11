@@ -95,7 +95,7 @@
   }
   function loadFromHistory(h) {
     const i = h.input;
-    Object.assign(S.current, { formatId: i.formatId, w: i.w, h: i.h, bleed: i.bleed, quantity: i.quantity, sheetId: i.sheetId, grammage: i.grammage, orientation: i.orientation, name: h.name, historyId: h.id });
+    Object.assign(S.current, { formatId: i.formatId, w: i.w, h: i.h, bleed: i.bleed, quantity: i.quantity, sheetId: i.sheetId, grammage: i.grammage, orientation: i.orientation === 'landscape' || (i.orientation !== 'portrait' && h.result && h.result.orientation === 'landscape') ? 'landscape' : 'portrait', name: h.name, historyId: h.id });
     if (!sheetById(i.sheetId)) {
       // arkusz usunięty: odtwórz jako własny
       const s = { id: i.sheetId, name: i.sheetName, w: i.sheetW, h: i.sheetH, gripper: i.gripper, margin: i.margin, group: i.margin ? 'digital' : 'offset' };
@@ -217,7 +217,7 @@
 
     app.innerHTML = `
     <div class="screen">
-      <header class="top">${logoBtn()}<span class="title" style="flex:1">Kalkulator Poligraficzny</span></header>
+      <header class="top"><span class="title" style="flex:1">Kalkulator Poligraficzny</span>${logoBtn()}</header>
       <form class="stack" id="f" autocomplete="off" onsubmit="return false">
         <div class="card stack">
           <div><span class="lbl">Format użytku</span>${hint('Użytek to jedna gotowa, przycięta praca, np. ulotka. Wybierz gotowy format albo wpisz wymiar netto, bez spadów.')}</div>
@@ -281,12 +281,11 @@
         </div>
         <div class="card stack8">
           <span class="lbl">Orientacja użytku</span>
-          <div class="seg" role="group" aria-label="Orientacja użytku" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-            <button type="button" class="${c.orientation === 'auto' ? 'on' : ''}" data-orient="auto">Auto</button>
+          <div class="seg" role="group" aria-label="Orientacja użytku">
             <button type="button" class="${c.orientation === 'portrait' ? 'on' : ''}" data-orient="portrait">Pion</button>
             <button type="button" class="${c.orientation === 'landscape' ? 'on' : ''}" data-orient="landscape">Poziom</button>
           </div>
-          ${hint('Jak obrócić użytek na arkuszu. Auto wybiera układ z większą liczbą użytków.')}
+          ${hint('Jak obrócić użytek na arkuszu: pion – jak format, poziom – obrócony o 90°.')}
         </div>
       </form>
       <div class="bottom">
@@ -678,7 +677,7 @@
       <div class="card sets">
         ${set('Spady', `${dim(s.bleed)} ${unit()}`, 'Zapas obrazu poza formatem netto, dodawany z każdej strony użytku. Zwykle 2–3 mm; przy etykietach i opakowaniach więcej.', seg('bleed', [0, 2, 3, 5], s.bleed, dim))}
         ${set('Chwyt maszyny', `${dim(s.gripper)} ${unit()}`, 'Pas u góry arkusza, którego łapy maszyny offsetowej nie zadrukują. Używany przy dodawaniu własnych arkuszy offsetowych.', seg('gripper', [0, 8, 10, 12], s.gripper, dim))}
-        ${set('Orientacja użytku', null, 'Jak układać użytek na arkuszu. Auto porównuje pion i poziom i wybiera układ z większą liczbą użytków.', seg('orientation', ['auto', 'portrait', 'landscape'], s.orientation, (v) => ({ auto: 'Auto', portrait: 'Pion', landscape: 'Poziom' }[v])))}
+        ${set('Orientacja użytku', null, 'Domyślne ułożenie użytku na arkuszu w nowych obliczeniach. W kalkulatorze zmienisz je dla pojedynczego zlecenia.', seg('orientation', ['portrait', 'landscape'], s.orientation, (v) => ({ portrait: 'Pion', landscape: 'Poziom' }[v])))}
         <a href="#/biblioteka/arkusze" class="set link"><div class="set-h"><span class="set-t">Arkusz domyślny</span><span class="set-v">${esc(def.name)} ›</span></div><p class="hint">${dims(def.w, def.h)} · ${def.gripper ? `chwyt ${dim(def.gripper)}` : `margines ${dim(def.margin)}`} ${unit()}. Wybierany automatycznie w nowych obliczeniach. Zmienisz go w bibliotece arkuszy.</p></a>
       </div>
 
@@ -760,7 +759,7 @@
       <div class="card help">
         <p><b>1. Użytek brutto.</b> Do formatu netto dodajemy spad z każdej strony: <code>148 × 210 + 2 × 3 = 154 × 216 mm</code>.</p>
         <p><b>2. Pole zadruku arkusza.</b> Od wysokości arkusza odejmujemy chwyt maszyny (pas u góry, którego łapy maszyny nie zadrukują). W druku cyfrowym zamiast chwytu odejmujemy margines z każdej strony. <code>B2: 500 × (700 − 10) = 500 × 690 mm</code>.</p>
-        <p><b>3. Użytki na arkuszu.</b> Liczymy, ile użytków zmieści się w pionie i w poziomie (zaokrąglając w dół), dla obu orientacji użytku. „Auto” wybiera lepszą. <code>500 ÷ 154 = 3, 690 ÷ 216 = 3 → 9 użytków</code>. Układy mieszane (część użytków obrócona) nie są liczone.</p>
+        <p><b>3. Użytki na arkuszu.</b> Liczymy, ile użytków zmieści się w pionie i w poziomie (zaokrąglając w dół), dla wybranej orientacji użytku (pion lub poziom). <code>500 ÷ 154 = 3, 690 ÷ 216 = 3 → 9 użytków</code>. Układy mieszane (część użytków obrócona) nie są liczone.</p>
         <p><b>4. Liczba arkuszy.</b> Nakład dzielimy przez użytki na arkuszu i zaokrąglamy w górę (lub do pełnych 10). <code>1 000 ÷ 9 = 111,1 → 112 arkuszy</code>. Nie dodajemy naddatku technologicznego na przyrząd i makulaturę: dolicz go według praktyki drukarni.</p>
         <p><b>5. Wykorzystanie.</b> Pole użytków brutto podzielone przez pole całego arkusza. <code>9 × 154 × 216 ÷ (500 × 700) = 86 %</code>.</p>
         <p><b>6. Waga.</b> Gramatura × powierzchnia. Arkusz B2 przy 130 g/m²: <code>130 × 0,35 m² = 45,5 g</code>; 112 arkuszy ≈ 5,1 kg. Waga sztuki liczona jest z formatu netto (po obcięciu).</p>

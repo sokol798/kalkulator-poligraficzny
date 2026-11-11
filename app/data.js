@@ -178,20 +178,20 @@
 
   const DEFAULT_SETTINGS = {
     bleed: 3, gripper: 10, grammage: 130, defaultSheetId: 'b2',
-    orientation: 'auto', rounding: 'up', autoHistory: true, unit: 'mm',
+    orientation: 'portrait', rounding: 'up', autoHistory: true, unit: 'mm',
     hints: true, step: 100,
   };
 
   const DEFAULT_CURRENT = {
     formatId: 'a5', w: 148, h: 210, bleed: 3, quantity: 1000,
-    sheetId: 'b2', grammage: 130, orientation: 'auto', name: '', historyId: null, gm: null,
+    sheetId: 'b2', grammage: 130, orientation: 'portrait', name: '', historyId: null, gm: null,
   };
 
   function load() {
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { saved = null; }
     const s = saved || {};
-    return {
+    const st = {
       settings: Object.assign({}, DEFAULT_SETTINGS, s.settings || {}),
       current: Object.assign({}, DEFAULT_CURRENT, s.current || {}),
       customFormats: Array.isArray(s.customFormats) ? s.customFormats : [],
@@ -200,6 +200,10 @@
       recentFormats: Array.isArray(s.recentFormats) ? s.recentFormats : [],
       recentSheets: Array.isArray(s.recentSheets) ? s.recentSheets : [],
     };
+    // starsze wersje miały orientację „auto”; teraz tylko pion / poziom
+    if (st.settings.orientation !== 'landscape') st.settings.orientation = 'portrait';
+    if (st.current.orientation !== 'landscape') st.current.orientation = 'portrait';
+    return st;
   }
 
   function save(state) {
