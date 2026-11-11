@@ -1,6 +1,6 @@
 /* Service worker: aplikacja działa offline. Strategia: sieć, a gdy brak, pamięć podręczna. */
-const CACHE = 'kalkulator-v5';
-const ASSETS = ['./', './index.html', './app.css?v=5', './calc.js?v=5', './data.js?v=5', './app.js?v=5', './manifest.json', './icon.svg'];
+const CACHE = 'kalkulator-v6';
+const ASSETS = ['./', './index.html', './app.css?v=6', './calc.js?v=6', './data.js?v=6', './app.js?v=6', './manifest.json', './icon.svg'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {

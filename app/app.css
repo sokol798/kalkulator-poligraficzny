@@ -138,6 +138,28 @@ header.top .spacer{width:44px}
 .own{display:grid;grid-template-columns:1fr 16px 1fr 1fr;gap:6px;align-items:center}
 .own span{text-align:center;color:var(--muted)}
 
+.hint{font-size:12px;line-height:16px;color:var(--muted);margin:0;font-weight:400}
+.hint a{text-decoration:underline;text-underline-offset:2px}
+.hint b{color:var(--ink);font-weight:600}
+.qbtn{border:1px solid var(--bg);cursor:pointer;font-weight:600}
+.qbtn:active{border-color:var(--ink)}
+.range{width:100%;height:36px;margin:0;accent-color:var(--ink);background:transparent;touch-action:pan-x}
+.lbl.scale{display:flex;justify-content:space-between;font-size:11px;margin-top:-6px}
+
+/* Ustawienia */
+.sets{padding:2px 16px}
+.set{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:0;border-right:0;border-top:0;font-family:inherit}
+.set:last-child{border-bottom:0}
+.set.row{flex-direction:row;align-items:center;justify-content:space-between;gap:16px}
+.set.row>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.set.link{cursor:pointer}
+.set.link:active{opacity:.6}
+.set.danger .set-t,.set.danger .set-v{color:#b42a18}
+.set-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.set-t{font-size:15px;font-weight:600}
+.set-v{font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap}
+.set .seg{margin-top:2px}
+
 .help p{font-size:15px;line-height:22px;margin:0 0 12px}
 .help code{background:var(--bg);padding:2px 6px;border-radius:6px;font-size:13px}
 .toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:var(--pill);font-size:14px;font-weight:500;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}

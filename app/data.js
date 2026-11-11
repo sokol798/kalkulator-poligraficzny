@@ -105,7 +105,9 @@
 
   // Arkusze drukarskie (mm). Offset: chwyt maszyny u góry. Cyfra: margines z każdej strony.
   const STANDARD_SHEETS = [
-    // Offset: formaty B (poligraficzne 700 × 1000, nie ISO)
+    // Offset: formaty B (poligraficzne 700 × 1000, nie ISO) i ich odmiany „plus”
+    { id: 'b0', name: 'B0', w: 1000, h: 1400, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'b0plus', name: 'B0+', w: 1020, h: 1440, gripper: 12, margin: 0, group: 'offset' },
     { id: 'b1', name: 'B1', w: 700, h: 1000, gripper: 12, margin: 0, group: 'offset' },
     { id: 'b1plus', name: 'B1+', w: 720, h: 1020, gripper: 12, margin: 0, group: 'offset' },
     { id: 'b2', name: 'B2', w: 500, h: 700, gripper: 10, margin: 0, group: 'offset' },
@@ -113,32 +115,71 @@
     { id: 'b3', name: 'B3', w: 350, h: 500, gripper: 8, margin: 0, group: 'offset' },
     { id: 'b3plus', name: 'B3+', w: 365, h: 520, gripper: 8, margin: 0, group: 'offset' },
     { id: 'b4', name: 'B4', w: 250, h: 350, gripper: 8, margin: 0, group: 'offset' },
-    // Offset: formaty A drukarskie, RA i SRA (ISO 217)
-    { id: 'a0d', name: 'A0 drukarski', w: 860, h: 1220, gripper: 12, margin: 0, group: 'offset' },
-    { id: 'a1d', name: 'A1 drukarski', w: 610, h: 860, gripper: 12, margin: 0, group: 'offset' },
+    // Offset: formaty A drukarskie (RA), SRA (ISO 217) i ISO A
+    { id: 'sra0', name: 'SRA0', w: 900, h: 1280, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'a0d', name: 'RA0 · A0 drukarski', w: 860, h: 1220, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'a0', name: 'A0', w: 841, h: 1189, gripper: 12, margin: 0, group: 'offset' },
     { id: 'sra1', name: 'SRA1', w: 640, h: 900, gripper: 12, margin: 0, group: 'offset' },
-    { id: 'a2d', name: 'A2 drukarski', w: 430, h: 610, gripper: 10, margin: 0, group: 'offset' },
-    { id: 'a2plus', name: 'A2+', w: 450, h: 640, gripper: 10, margin: 0, group: 'offset' },
-    { id: 'a3d2', name: 'A3 drukarski', w: 305, h: 430, gripper: 8, margin: 0, group: 'offset' },
+    { id: 'a1d', name: 'RA1 · A1 drukarski', w: 610, h: 860, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'a1', name: 'A1', w: 594, h: 841, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'a2plus', name: 'SRA2 · A2+', w: 450, h: 640, gripper: 10, margin: 0, group: 'offset' },
+    { id: 'a2d', name: 'RA2 · A2 drukarski', w: 430, h: 610, gripper: 10, margin: 0, group: 'offset' },
+    { id: 'a2', name: 'A2', w: 420, h: 594, gripper: 10, margin: 0, group: 'offset' },
     { id: 'sra3o', name: 'SRA3 offset', w: 320, h: 450, gripper: 8, margin: 0, group: 'offset' },
+    { id: 'a3d2', name: 'RA3 · A3 drukarski', w: 305, h: 430, gripper: 8, margin: 0, group: 'offset' },
+    { id: 'a3o', name: 'A3', w: 297, h: 420, gripper: 8, margin: 0, group: 'offset' },
     { id: 'sra4o', name: 'SRA4 offset', w: 225, h: 320, gripper: 8, margin: 0, group: 'offset' },
+    { id: 'ra4', name: 'RA4', w: 215, h: 305, gripper: 8, margin: 0, group: 'offset' },
+    // Offset: formaty maszyn (maksymalny arkusz)
+    { id: 'xl162', name: 'XL 162 · 1210 × 1620', w: 1210, h: 1620, gripper: 14, margin: 0, group: 'offset' },
+    { id: 'xl145', name: 'XL 145 · 1060 × 1450', w: 1060, h: 1450, gripper: 14, margin: 0, group: 'offset' },
+    { id: 'xl106', name: 'XL 106 · 750 × 1060', w: 750, h: 1060, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'f7201050', name: 'Komori 40 · 720 × 1050', w: 720, h: 1050, gripper: 12, margin: 0, group: 'offset' },
     { id: 'f6490', name: '64 × 90', w: 640, h: 900, gripper: 12, margin: 0, group: 'offset' },
-    { id: 'f5375', name: '53 × 75', w: 530, h: 750, gripper: 10, margin: 0, group: 'offset' },
-    // Cyfra (margines niezadrukowany z każdej strony)
-    { id: 'sra3', name: 'SRA3', w: 320, h: 450, gripper: 0, margin: 5, group: 'digital' },
-    { id: 'sra3plus', name: 'SRA3+', w: 330, h: 488, gripper: 0, margin: 5, group: 'digital' },
-    { id: 'a3plusd', name: 'A3+', w: 329, h: 483, gripper: 0, margin: 5, group: 'digital' },
-    { id: 'f320464', name: '320 × 464', w: 320, h: 464, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f6388', name: '63 × 88', w: 630, h: 880, gripper: 12, margin: 0, group: 'offset' },
+    { id: 'xl75', name: 'XL 75 · 605 × 750', w: 605, h: 750, gripper: 10, margin: 0, group: 'offset' },
+    { id: 'f5375', name: 'SM 74 · 530 × 750', w: 530, h: 750, gripper: 10, margin: 0, group: 'offset' },
+    { id: 'f4866', name: '48 × 66', w: 480, h: 660, gripper: 10, margin: 0, group: 'offset' },
+    { id: 'sm52', name: 'SM 52 · 370 × 520', w: 370, h: 520, gripper: 8, margin: 0, group: 'offset' },
+    { id: 'gto46', name: 'GTO 46 · 340 × 460', w: 340, h: 460, gripper: 8, margin: 0, group: 'offset' },
+    // Cyfra: margines niezadrukowany z każdej strony
+    { id: 'indigo', name: 'B2 Indigo · 530 × 750', w: 530, h: 750, gripper: 0, margin: 10, group: 'digital' },
+    { id: 'f3641250', name: 'B2 cyfra · 364 × 1250', w: 364, h: 1250, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f3301300', name: 'Baner 330 × 1300', w: 330, h: 1300, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f3301200', name: 'Baner 330 × 1200', w: 330, h: 1200, gripper: 0, margin: 5, group: 'digital' },
     { id: 'f330700', name: 'Baner 330 × 700', w: 330, h: 700, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f364515', name: 'B3+ cyfra · 364 × 515', w: 364, h: 515, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'b3dig', name: 'B3 cyfra · 350 × 500', w: 350, h: 500, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'sra3plus', name: 'SRA3+', w: 330, h: 488, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'a3plusd', name: 'A3+ · 329 × 483', w: 329, h: 483, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f330483', name: '13 × 19″ · 330 × 483', w: 330, h: 483, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f320464', name: 'Indigo · 320 × 464', w: 320, h: 464, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'sra3', name: 'SRA3', w: 320, h: 450, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'f305457', name: '12 × 18″ · 305 × 457', w: 305, h: 457, gripper: 0, margin: 5, group: 'digital' },
     { id: 'a3d', name: 'A3', w: 297, h: 420, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'tabloid', name: 'Tabloid 11 × 17″', w: 279, h: 432, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'b4dig', name: 'B4 cyfra · 250 × 353', w: 250, h: 353, gripper: 0, margin: 5, group: 'digital' },
     { id: 'sra4', name: 'SRA4', w: 225, h: 320, gripper: 0, margin: 5, group: 'digital' },
+    { id: 'letterd', name: 'Letter 8,5 × 11″', w: 216, h: 279, gripper: 0, margin: 5, group: 'digital' },
     { id: 'a4d', name: 'A4', w: 210, h: 297, gripper: 0, margin: 5, group: 'digital' },
-    { id: 'indigo', name: 'B2 Indigo', w: 530, h: 750, gripper: 0, margin: 10, group: 'digital' },
+    { id: 'a5d', name: 'A5', w: 148, h: 210, gripper: 0, margin: 3, group: 'digital' },
+    // Wielki format: arkusze i odcinki rolki z ploterów (margines z każdej strony)
+    { id: 'pl3200', name: 'Rolka 320 cm · 3200 × 5000', w: 3200, h: 5000, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'pl1600', name: 'Rolka 160 cm · 1600 × 3000', w: 1600, h: 3000, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'pl1370', name: 'Rolka 137 cm · 1370 × 2500', w: 1370, h: 2500, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'pl1067', name: 'Rolka 107 cm · 1067 × 2000', w: 1067, h: 2000, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'pl914', name: 'Rolka 91 cm · 914 × 1500', w: 914, h: 1500, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'pl610', name: 'Rolka 61 cm · 610 × 1000', w: 610, h: 1000, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'uv1220', name: 'Płyta 1220 × 2440', w: 1220, h: 2440, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'uv1250', name: 'Płyta 1250 × 2500', w: 1250, h: 2500, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'uv1000', name: 'Płyta 1000 × 1400', w: 1000, h: 1400, gripper: 0, margin: 10, group: 'wide' },
+    { id: 'uv700', name: 'Płyta 700 × 1000', w: 700, h: 1000, gripper: 0, margin: 10, group: 'wide' },
   ];
 
   const DEFAULT_SETTINGS = {
     bleed: 3, gripper: 10, grammage: 130, defaultSheetId: 'b2',
     orientation: 'auto', rounding: 'up', autoHistory: true, unit: 'mm',
+    hints: true, step: 100,
   };
 
   const DEFAULT_CURRENT = {
