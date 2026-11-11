@@ -146,7 +146,7 @@
   }
 
   /* ---------- nawigacja ---------- */
-  const logoBtn = () => `<button type="button" class="icobtn logo no-print" id="menu" aria-label="Menu"><img src="icon.svg" alt="" width="44" height="44"></button>`;
+  const logoBtn = () => `<button type="button" class="icobtn logo no-print" id="menu" aria-label="Menu"><img src="icon.svg?v=2" alt="" width="44" height="44"></button>`;
   const backBtn = (href) => `<a href="${href || '#/'}" class="icobtn no-print" aria-label="Wstecz">${I.back}</a>`;
   function bindMenu() { const b = app.querySelector('#menu'); if (b) b.addEventListener('click', openMenu); }
   function openMenu() {
