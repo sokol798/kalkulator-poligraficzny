@@ -464,7 +464,6 @@
         <div class="rrow"><span class="lbl">Arkusz netto</span><span class="v">${esc(sh.name)} (${dims(sh.w, sh.h)})</span></div>
         <div class="rrow"><span class="lbl">${sh.gripper ? 'Z chwytem' : 'Z marginesem'}</span><span class="v">${dim(sh.gripper || sh.margin)} ${unit()}</span></div>
         <div class="rrow"><span class="lbl">Wykorzystanie · ostatni arkusz</span><span class="v">${nf0.format(r.utilization * 100)} % · ${r.lastSheet} ${r.lastSheet === 1 ? 'użytek' : 'użytki'}</span></div>
-        ${r.exact !== r.sheets ? `<div class="rrow"><span class="lbl">Dokładnie</span><span class="v">${nf2.format(r.exact)} ark. → zaokrąglone ${S.settings.rounding === 'ten' ? 'do 10' : 'w górę'}</span></div>` : ''}
         <div class="rrow"><span class="lbl">Waga arkuszy (${nf0.format(r.sheets)} × ${nf1.format(r.weight.sheet)} g)</span><span class="v">${kg(r.weight.sheetsTotal)}</span></div>
         <div class="rrow"><span class="lbl">Data</span><span class="v">${dateStr}</span></div>
       </div>
