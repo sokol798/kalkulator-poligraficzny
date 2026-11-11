@@ -23,8 +23,10 @@ i otwórz http://127.0.0.1:8765/ (telefon w tej samej sieci Wi-Fi: adres IP komp
 ## Co umie
 
 - **Kalkulator**: szybkie formaty (A4, A5, A6, DL i ostatnio używane), wymiar własny, nakład
-  z krokiem ±100, wybór arkusza, gramatura, orientacja użytku (auto / pion / poziom),
-  wynik na żywo z podglądem rozkładu na arkuszu, waga arkuszy i nakładu.
+  z krokiem ±100 i suwakiem 1–1 000 000, wybór arkusza, gramatura, spady, chwyt/margines,
+  orientacja użytku (auto / pion / poziom); przycisk „Oblicz” otwiera kartę zlecenia
+  z liczbą arkuszy, rozkładem na arkuszu i wagą papieru. Menu pod logo: biblioteka,
+  historia, ustawienia, kontakt (adres w `app/data.js`, stała `CONTACT_EMAIL`).
 - **Karta zlecenia**: wszystkie liczby jednego obliczenia, numerowany rozkład użytków,
   zapis do PDF (przez drukowanie), udostępnianie tekstu, nazwa zlecenia.
 - **Biblioteka**: formaty standardowe i własne (ze spadem), arkusze offsetowe (chwyt)

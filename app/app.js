@@ -40,10 +40,16 @@
   function currentSheet() {
     return sheetById(S.current.sheetId) || sheetById(S.settings.defaultSheetId) || Data.STANDARD_SHEETS[0];
   }
+  /** Arkusz z chwytem/marginesem zmienionym w kalkulatorze (c.gm), albo oryginalny. */
+  function effectiveSheet() {
+    const s = currentSheet();
+    if (S.current.gm == null) return s;
+    return Object.assign({}, s, s.group === 'offset' ? { gripper: S.current.gm, margin: 0 } : { margin: S.current.gm, gripper: 0 });
+  }
   function currentInput() {
     const c = S.current;
     return {
-      format: { w: c.w, h: c.h }, sheet: currentSheet(), bleed: c.bleed, quantity: c.quantity,
+      format: { w: c.w, h: c.h }, sheet: effectiveSheet(), bleed: c.bleed, quantity: c.quantity,
       grammage: c.grammage, orientation: c.orientation, rounding: S.settings.rounding,
     };
   }
@@ -58,7 +64,7 @@
     persist();
   }
   function useSheet(s) {
-    S.current.sheetId = s.id;
+    S.current.sheetId = s.id; S.current.gm = null;
     S.recentSheets = [s.id].concat(S.recentSheets.filter((x) => x !== s.id)).slice(0, 4);
     persist();
   }
@@ -71,7 +77,7 @@
   /** Zapis bieżącego obliczenia w historii (nowy wpis albo aktualizacja). */
   function saveToHistory(star) {
     const r = currentResult();
-    const sh = currentSheet();
+    const sh = effectiveSheet();
     const entry = {
       id: S.current.historyId || uid(), ts: Date.now(), name: S.current.name || '',
       starred: false,
@@ -114,6 +120,7 @@
     calc: '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2" width="12" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h6M6 9.5h2M10 9.5h2M6 13h2M10 13h2" stroke="currentColor" stroke-width="1.5"/></svg>',
     lib: '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 9h13M9 2.5v13" stroke="currentColor" stroke-width="1.5"/></svg>',
     hist: '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+    mail: '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="2" y="4" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 5l6.5 5 6.5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
     trash: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 3.5h10M5 3.5V2h4v1.5M3.5 3.5l.7 8.5h5.6l.7-8.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>',
   };
 
@@ -139,12 +146,34 @@
   }
 
   /* ---------- nawigacja ---------- */
-  const tabsHTML = (active) => `
-    <nav class="tabs no-print" aria-label="Nawigacja">
-      <a href="#/" class="tab ${active === 'calc' ? 'on' : ''}">${I.calc}Kalkulator</a>
-      <a href="#/biblioteka/formaty" class="tab ${active === 'lib' ? 'on' : ''}">${I.lib}Biblioteka</a>
-      <a href="#/historia" class="tab ${active === 'hist' ? 'on' : ''}">${I.hist}Historia</a>
-    </nav>`;
+  const logoBtn = () => `<button type="button" class="icobtn logo no-print" id="menu" aria-label="Menu"><img src="icon.svg" alt="" width="44" height="44"></button>`;
+  const backBtn = (href) => `<a href="${href || '#/'}" class="icobtn no-print" aria-label="Wstecz">${I.back}</a>`;
+  function bindMenu() { const b = app.querySelector('#menu'); if (b) b.addEventListener('click', openMenu); }
+  function openMenu() {
+    const item = (href, icon, t, sub) => `<a href="${href}" class="opt" data-nav><span class="nm" style="display:flex;align-items:center;gap:10px">${icon}${t}</span><span class="dim">${sub}</span></a>`;
+    const el = openSheet(`${sheetHead('Kalkulator Poligraficzny')}
+      ${item('#/', I.calc, 'Kalkulator', 'Nowe obliczenie')}
+      ${item('#/biblioteka/formaty', I.lib, 'Biblioteka', `${Data.STANDARD_FORMATS.length + S.customFormats.length} formatów · ${Data.STANDARD_SHEETS.length + S.customSheets.length} arkuszy`)}
+      ${item('#/historia', I.hist, 'Historia', S.history.length ? `${S.history.length} ${S.history.length === 1 ? 'obliczenie' : S.history.length < 5 ? 'obliczenia' : 'obliczeń'}` : 'Pusta')}
+      ${item('#/ustawienia', I.gear, 'Ustawienia', 'Spady, chwyt, jednostki, kopia zapasowa')}
+      <button type="button" class="opt" id="contact"><span class="nm" style="display:flex;align-items:center;gap:10px">${I.mail}Kontakt</span><span class="dim">Pytania, błędy, pomysły</span></button>`);
+    el.querySelector('[data-close]').addEventListener('click', closeSheet);
+    el.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', () => { closeSheet(); if (a.getAttribute('href') === location.hash) route(); }));
+    el.querySelector('#contact').addEventListener('click', openContact);
+  }
+  function openContact() {
+    const mail = Data.CONTACT_EMAIL;
+    const el = openSheet(`${sheetHead('Kontakt')}
+      <div class="card stack8">
+        <div class="lbl">E-mail</div>
+        <div style="font-size:17px;font-weight:600;word-break:break-all" id="mailTxt">${esc(mail)}</div>
+        <p class="hint">Napisz, jeśli brakuje formatu lub arkusza, coś się źle liczy albo masz pomysł na funkcję.</p>
+      </div>
+      <div class="actions" style="margin-top:4px"><a class="btn" href="mailto:${esc(mail)}?subject=${encodeURIComponent('Kalkulator Poligraficzny')}">Napisz e-mail</a><button type="button" class="btn light auto" id="copyMail">Kopiuj</button></div>
+      <p class="hint" style="margin:8px 4px 0">Kalkulator Poligraficzny · wersja 1.2 · dane są przechowywane tylko w tej przeglądarce.</p>`);
+    el.querySelector('[data-close]').addEventListener('click', closeSheet);
+    el.querySelector('#copyMail').addEventListener('click', async () => { try { await navigator.clipboard.writeText(mail); toast('Adres skopiowany'); } catch (e) { toast(mail); } });
+  }
 
   function route() {
     closeSheet();
@@ -169,7 +198,7 @@
   function renderCalc() {
     const c = S.current;
     const r = currentResult();
-    const sh = currentSheet();
+    const sh = effectiveSheet();
     // 4 szybkie formaty: ostatnio używane + standardowe
     const quickIds = []; S.recentFormats.forEach((id) => { if (formatById(id) && quickIds.length < 4) quickIds.push(id); });
     ['a5', 'a4', 'a6', 'dl'].forEach((id) => { if (quickIds.length < 4 && !quickIds.includes(id)) quickIds.push(id); });
@@ -178,13 +207,17 @@
     const grams = [80, 130, 170, 300];
     const gramCustom = !grams.includes(c.grammage);
     const step = S.settings.step || 100;
+    const bleeds = [0, 2, 3, 5];
+    const isOffset = sh.group === 'offset';
+    const gms = isOffset ? [0, 8, 10, 12] : [0, 3, 5, 10];
+    const gmCur = isOffset ? sh.gripper : sh.margin;
     const hint = (t) => S.settings.hints ? `<p class="hint">${t}</p>` : '';
     const noFit = r.perSheet === 0;
     const entry = c.historyId ? S.history.find((x) => x.id === c.historyId) : null;
 
     app.innerHTML = `
     <div class="screen">
-      <header class="top"><span class="title">Kalkulator Poligraficzny</span><a href="#/ustawienia" class="icobtn" aria-label="Ustawienia">${I.gear}</a></header>
+      <header class="top">${logoBtn()}<span class="title" style="flex:1">Kalkulator Poligraficzny</span></header>
       <form class="stack" id="f" autocomplete="off" onsubmit="return false">
         <div class="card stack">
           <div><span class="lbl">Format użytku</span>${hint('Użytek to jedna gotowa, przycięta praca, np. ulotka. Wybierz gotowy format albo wpisz wymiar netto, bez spadów.')}</div>
@@ -228,33 +261,39 @@
           </div>
           ${hint('Gramatura, czyli waga metra kwadratowego papieru. Służy tylko do policzenia wagi nakładu.')}
         </div>
-        <a href="#/ustawienia" class="lbl linkrow"><span>Spady ${dim(c.bleed)} ${unit()} · ${sh.gripper ? `chwyt ${dim(sh.gripper)} ${unit()}` : `margines ${dim(sh.margin)} ${unit()}`} · orientacja ${{ auto: 'auto', portrait: 'pion', landscape: 'poziom' }[c.orientation]}</span><b>Zmień</b></a>
-      </form>
-
-      <section class="card result">
-        <div class="main">
-          <div>
-            <div class="lbl">Potrzebujesz</div>
-            <div class="big">${noFit ? '—' : nf0.format(r.sheets)}</div>
-            ${noFit ? `<div class="warn">Użytek ${dims(r.layout.gross.w, r.layout.gross.h)} ze spadami nie mieści się na arkuszu ${esc(sh.name)}.</div>` : `
-            <div class="line">arkuszy ${esc(sh.name)} <span class="lbl">· ${r.perSheet} na arkuszu · ${nf0.format(r.utilization * 100)} %</span></div>
-            <div class="line">≈ ${kg(r.weight.sheetsTotal)} papieru <span class="lbl">· ${nf1.format(r.weight.piece)} g / szt. · ${kg(r.weight.piecesTotal)} nakład</span></div>`}
+        <div class="row2">
+          <div class="card stack8">
+            <span class="lbl">Spady (${unit()})</span>
+            <div class="chips">
+              ${bleeds.map((v) => `<button type="button" class="chip sm ${c.bleed === v ? 'on' : ''}" data-bleed="${v}">${dim(v)}</button>`).join('')}
+              <input class="num pill ${bleeds.includes(c.bleed) ? '' : 'on'}" id="bl" inputmode="decimal" placeholder="inne" value="${bleeds.includes(c.bleed) ? '' : fromMm(c.bleed)}" aria-label="Inny spad" style="width:56px">
+            </div>
+            ${hint('Zapas obrazu poza formatem, z każdej strony. Zwykle 2–3 mm.')}
           </div>
-          <a href="#/karta" class="preview" aria-label="Zobacz rozkład na arkuszu" style="width:86px;height:${Math.round(86 * sh.h / sh.w)}px">${previewSVG(r, sh)}</a>
+          <div class="card stack8">
+            <span class="lbl">${isOffset ? 'Chwyt' : 'Margines'} (${unit()})</span>
+            <div class="chips">
+              ${gms.map((v) => `<button type="button" class="chip sm ${gmCur === v ? 'on' : ''}" data-gm="${v}">${dim(v)}</button>`).join('')}
+              <input class="num pill ${gms.includes(gmCur) ? '' : 'on'}" id="gmi" inputmode="decimal" placeholder="inne" value="${gms.includes(gmCur) ? '' : fromMm(gmCur)}" aria-label="Inny ${isOffset ? 'chwyt' : 'margines'}" style="width:56px">
+            </div>
+            ${hint(isOffset ? 'Pas u góry arkusza, którego łapy maszyny nie zadrukują.' : 'Pas niezadrukowany z każdej strony arkusza.')}
+          </div>
         </div>
-        <div class="seg" role="group" aria-label="Orientacja użytku" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-          <button type="button" class="${c.orientation === 'auto' ? 'on' : ''}" data-orient="auto">Auto · ${Math.max(r.layout.portrait.count, r.layout.landscape.count)}</button>
-          <button type="button" class="${c.orientation === 'portrait' ? 'on' : ''}" data-orient="portrait">Pion · ${r.layout.portrait.count}</button>
-          <button type="button" class="${c.orientation === 'landscape' ? 'on' : ''}" data-orient="landscape">Poziom · ${r.layout.landscape.count}</button>
+        <div class="card stack8">
+          <span class="lbl">Orientacja użytku</span>
+          <div class="seg" role="group" aria-label="Orientacja użytku" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+            <button type="button" class="${c.orientation === 'auto' ? 'on' : ''}" data-orient="auto">Auto</button>
+            <button type="button" class="${c.orientation === 'portrait' ? 'on' : ''}" data-orient="portrait">Pion</button>
+            <button type="button" class="${c.orientation === 'landscape' ? 'on' : ''}" data-orient="landscape">Poziom</button>
+          </div>
+          ${hint('Jak obrócić użytek na arkuszu. Auto wybiera układ z większą liczbą użytków.')}
         </div>
-        ${hint('Liczba arkuszy na cały nakład, bez naddatku na przyrząd i makulaturę. Auto, Pion i Poziom to ułożenie użytku na arkuszu; liczba obok to użytki na jednym arkuszu. Dotknij miniatury, aby zobaczyć rozkład. <a href="#/pomoc"><b>Jak liczymy ›</b></a>')}
-      </section>
-
-      <div class="actions">
-        <a href="#/karta" class="btn">Karta zlecenia ${I.arrow}</a>
-        <button type="button" class="round ${entry && entry.starred ? 'on' : ''}" id="star" aria-label="Zapisz w historii">${entry && entry.starred ? I.saveOn : I.save}</button>
+      </form>
+      <div class="bottom">
+        ${noFit ? `<div class="warn" style="margin:0 4px 10px">Użytek ${dims(r.layout.gross.w, r.layout.gross.h)} ze spadami nie mieści się na arkuszu ${esc(sh.name)}.</div>` : ''}
+        <button type="button" class="btn big" id="calc" ${noFit ? 'disabled' : ''}>Oblicz ${I.arrow}</button>
+        ${hint('Wynik otworzy się jako karta zlecenia: liczba arkuszy, rozkład na arkuszu, waga papieru. Tam ją zapiszesz lub udostępnisz.')}
       </div>
-      ${tabsHTML('calc')}
     </div>`;
 
     const $ = (sel) => app.querySelector(sel);
@@ -273,10 +312,16 @@
     app.querySelectorAll('[data-format]').forEach((b) => b.addEventListener('click', () => { useFormat(formatById(b.dataset.format)); c.historyId = null; renderCalc(); }));
     app.querySelectorAll('[data-sheet]').forEach((b) => b.addEventListener('click', () => { useSheet(sheetById(b.dataset.sheet)); c.historyId = null; renderCalc(); }));
     app.querySelectorAll('[data-gram]').forEach((b) => b.addEventListener('click', () => { c.grammage = Number(b.dataset.gram); c.historyId = null; persist(); renderCalc(); }));
+    const setGm = (v) => { c.gm = v; c.historyId = null; persist(); renderCalc(); };
+    app.querySelectorAll('[data-bleed]').forEach((b) => b.addEventListener('click', () => { c.bleed = Number(b.dataset.bleed); c.historyId = null; persist(); renderCalc(); }));
+    $('#bl').addEventListener('change', (e) => { if (e.target.value.trim() === '') return renderCalc(); c.bleed = toMm(e.target.value); c.historyId = null; persist(); renderCalc(); });
+    app.querySelectorAll('[data-gm]').forEach((b) => b.addEventListener('click', () => setGm(Number(b.dataset.gm))));
+    $('#gmi').addEventListener('change', (e) => { if (e.target.value.trim() === '') return renderCalc(); setGm(toMm(e.target.value)); });
+    ['#bl', '#gmi'].forEach((sel) => $(sel).addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); }));
+    $('#calc').addEventListener('click', () => { if (noFit) return toast('Użytek nie mieści się na arkuszu'); location.hash = '#/karta'; });
     app.querySelectorAll('[data-orient]').forEach((b) => b.addEventListener('click', () => { c.orientation = b.dataset.orient; c.historyId = null; persist(); renderCalc(); }));
     app.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => b.dataset.open === 'format' ? openFormatSheet() : openSheetSheet()));
-    $('#star').addEventListener('click', () => { if (noFit) return toast('Nie ma czego zapisać: użytek nie mieści się'); const e = saveToHistory(true); toast(e.starred ? 'Zapisano w historii ★' : 'Usunięto gwiazdkę'); renderCalc(); });
-    app.querySelector('a[href="#/karta"].btn').addEventListener('click', (e) => { if (noFit) { e.preventDefault(); toast('Użytek nie mieści się na arkuszu'); } });
+    bindMenu();
   }
 
   /* ---------- arkusze dolne ---------- */
@@ -317,8 +362,7 @@
       <div class="card stack8">
         <input class="num" id="qv" inputmode="numeric" value="${nf0.format(v)}" aria-label="Nakład w sztukach" style="font-size:32px;min-height:64px">
         <input type="range" class="range" id="qs" min="0" max="1000" step="1" value="${toPos(v)}" aria-label="Suwak nakładu od 1 do 1 000 000">
-        <div class="lbl scale"><span>1</span><span>100</span><span>10 000</span><span>1 000 000</span></div>
-        <p class="hint">Suwak jest logarytmiczny: na początku zmienia po sztuce, na końcu po tysiącach. Dokładną liczbę wpisz w polu powyżej.</p>
+        <div class="lbl scale"><span style="left:0">1</span><span style="left:16.67%">10</span><span style="left:33.33%">100</span><span style="left:50%">1 000</span><span style="left:66.67%">10 000</span><span style="left:83.33%">100 000</span><span style="left:100%">1 mln</span></div>
       </div>
       <div class="chips" id="qp">${presets.map((p) => `<button type="button" class="chip sm ${p === v ? 'on' : ''}" data-q="${p}">${nf0.format(p)}</button>`).join('')}</div>
       <div class="actions" style="margin-top:8px"><button type="button" class="btn" id="qok">Ustaw <span id="qokv">${nf0.format(v)}</span> szt.</button></div>`);
@@ -390,7 +434,7 @@
   function renderCard(id) {
     if (id) { const h = S.history.find((x) => x.id === id); if (h) loadFromHistory(h); }
     const r = currentResult();
-    const sh = currentSheet();
+    const sh = effectiveSheet();
     const c = S.current;
     if (r.perSheet === 0) { location.hash = '#/'; return; }
     let entry = c.historyId ? S.history.find((x) => x.id === c.historyId) : null;
@@ -409,9 +453,9 @@
           <div class="preview" style="width:${pw}px;height:${ph}px;border-radius:6px">${previewSVG(r, sh, { numbers: true })}</div>
           <div class="stack" style="flex:1">
             <div><div class="lbl">Arkuszy ${esc(sh.name)}</div><div style="font-size:48px;line-height:1;font-weight:600;letter-spacing:-.04em;margin-top:2px">${nf0.format(r.sheets)}</div></div>
-            <div><div class="lbl">Nakład</div><div style="font-size:17px;font-weight:600">${nf0.format(r.quantity)} szt.</div></div>
-            <div><div class="lbl">Na arkuszu</div><div style="font-size:17px;font-weight:600">${r.perSheet} · ${lay.cols} × ${lay.rows} · ${orientPl}</div></div>
-            <div><div class="lbl">Papier</div><div style="font-size:17px;font-weight:600">${r.grammage} g/m² · ${kg(r.weight.sheetsTotal)}</div></div>
+            <div><div class="lbl">Nakład · ilość szt.</div><div style="font-size:17px;font-weight:600">${nf0.format(r.quantity)} szt.</div></div>
+            <div><div class="lbl">Na arkuszu · użytki</div><div style="font-size:17px;font-weight:600">${lay.cols} × ${lay.rows} · ${r.perSheet} szt. <span class="lbl" style="font-weight:500">${orientPl}</span></div></div>
+            <div><div class="lbl">Papier · waga arkuszy</div><div style="font-size:17px;font-weight:600">${kg(r.weight.sheetsTotal)} <span class="lbl" style="font-weight:500">${r.grammage} g/m²</span></div></div>
           </div>
         </div>
       </div>
@@ -429,7 +473,7 @@
         <button type="button" class="btn light" id="pdf">${I.pdf}Pobierz PDF</button>
         <button type="button" class="btn light" id="share">${I.share}Udostępnij</button>
       </div>
-      <div class="bottom no-print"><a href="#/" class="btn" id="new">Nowe obliczenie</a></div>
+      <div class="bottom no-print actions"><a href="#/" class="btn light" id="new">Zmień dane</a><a href="#/" class="btn" id="fresh">Nowe obliczenie</a></div>
     </div>`;
     const $ = (s) => app.querySelector(s);
     $('#n').addEventListener('input', (e) => { c.name = e.target.value; if (c.historyId) { const h = S.history.find((x) => x.id === c.historyId); if (h) h.name = c.name; } persist(); });
@@ -442,7 +486,7 @@
         else { await navigator.clipboard.writeText(text); toast('Skopiowano do schowka'); }
       } catch (e) { /* anulowano */ }
     });
-    $('#new').addEventListener('click', () => { Object.assign(c, { name: '', historyId: null }); persist(); });
+    $('#fresh').addEventListener('click', () => { Object.assign(c, { name: '', historyId: null }); persist(); });
   }
   function cardText(r, sh, c) {
     return [
@@ -473,11 +517,10 @@
     };
     app.innerHTML = `
     <div class="screen">
-      <header class="top"><span class="title">Biblioteka</span><a href="#/nowy-format" class="icobtn dark" aria-label="Dodaj format">${I.plus}</a></header>
+      <header class="top">${backBtn()}<span class="title" style="flex:1">Biblioteka</span><a href="#/nowy-format" class="icobtn dark" aria-label="Dodaj format">${I.plus}</a></header>
       <nav class="seg inv" aria-label="Rodzaj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><a href="#/biblioteka/formaty" class="on" style="display:flex;align-items:center;justify-content:center;border-radius:999px;padding:10px;font-size:14px;font-weight:500;min-height:40px;background:#111;color:#fff">Formaty</a><a href="#/biblioteka/arkusze" style="display:flex;align-items:center;justify-content:center;border-radius:999px;padding:10px;font-size:14px;font-weight:500;min-height:40px;color:var(--muted)">Arkusze</a></nav>
       <div class="search">${I.search}<label for="q" style="position:absolute;left:-9999px">Szukaj</label><input class="txt" id="q" placeholder="Szukaj: A5, 148, wizytówka…"></div>
       <div id="list">${render('')}</div>
-      ${tabsHTML('lib')}
     </div>`;
     const list = app.querySelector('#list');
     const bind = () => {
@@ -494,11 +537,10 @@
     const row = (s) => { const def = S.settings.defaultSheetId === s.id; const custom = S.customSheets.includes(s); return `<div class="item" style="min-height:68px"><span class="thumb" style="width:34px;height:${Math.round(34 * s.h / s.w)}px;border-radius:2px;position:relative;overflow:hidden">${s.gripper ? `<i style="position:absolute;left:0;right:0;top:0;height:${Math.max(2, Math.round(34 * s.gripper / s.w))}px;background:#c3cad1"></i>` : `<i style="position:absolute;inset:${Math.max(2, Math.round(34 * s.margin / s.w))}px;border:1px dashed #b7bfc7"></i>`}</span><${custom ? `a href="#/nowy-arkusz?id=${s.id}"` : 'span'} class="grow"><span class="nm lg">${esc(s.name)}</span><span class="lbl">${dims(s.w, s.h)} · ${s.gripper ? `chwyt ${dim(s.gripper)}` : `margines ${dim(s.margin)}`}</span></${custom ? 'a' : 'span'}><button type="button" class="use ${def ? 'on' : ''}" data-def="${s.id}" aria-pressed="${def}">${def ? 'Domyślny' : 'Użyj'}</button>${custom ? `<button type="button" class="del" data-del="${s.id}" aria-label="Usuń arkusz ${esc(s.name)}">${I.trash}</button>` : ''}</div>`; };
     app.innerHTML = `
     <div class="screen">
-      <header class="top"><span class="title">Biblioteka</span><a href="#/nowy-arkusz" class="icobtn dark" aria-label="Dodaj arkusz">${I.plus}</a></header>
+      <header class="top">${backBtn()}<span class="title" style="flex:1">Biblioteka</span><a href="#/nowy-arkusz" class="icobtn dark" aria-label="Dodaj arkusz">${I.plus}</a></header>
       <nav class="seg inv" aria-label="Rodzaj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><a href="#/biblioteka/formaty" style="display:flex;align-items:center;justify-content:center;border-radius:999px;padding:10px;font-size:14px;font-weight:500;min-height:40px;color:var(--muted)">Formaty</a><a href="#/biblioteka/arkusze" style="display:flex;align-items:center;justify-content:center;border-radius:999px;padding:10px;font-size:14px;font-weight:500;min-height:40px;background:#111;color:#fff">Arkusze</a></nav>
       <p class="lbl" style="margin:12px 4px 0">Dotknij „Użyj”, aby arkusz był domyślny: wybierany automatycznie w kalkulatorze. Arkusz domyślny jest też używany w podglądzie nowego formatu.</p>
       ${groups.map(([g, t]) => { const items = allSheets().filter((s) => s.group === g); return items.length ? `<div class="sec">${t}</div><div class="stack8">${items.map(row).join('')}</div>` : ''; }).join('')}
-      ${tabsHTML('lib')}
     </div>`;
     app.querySelectorAll('[data-def]').forEach((b) => b.addEventListener('click', () => { S.settings.defaultSheetId = b.dataset.def; useSheet(sheetById(b.dataset.def)); S.current.historyId = null; persist(); renderSheets(); toast(`${sheetById(b.dataset.def).name} jest arkuszem domyślnym`); }));
     app.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => { const s = sheetById(b.dataset.del); if (!await ask(`Usunąć arkusz „${s.name}”?`)) return; S.customSheets = S.customSheets.filter((x) => x.id !== s.id); S.recentSheets = S.recentSheets.filter((x) => x !== s.id); if (S.settings.defaultSheetId === s.id) S.settings.defaultSheetId = 'b2'; if (S.current.sheetId === s.id) S.current.sheetId = S.settings.defaultSheetId; persist(); renderSheets(); }));
@@ -609,10 +651,9 @@
     const row = (h) => `<div class="item" style="min-height:76px"><span class="big">${nf0.format(h.result.sheets)}</span><a href="#/karta?id=${h.id}" class="grow"><span class="nm">${esc(h.name || h.input.formatName || 'Obliczenie')}${h.starred ? ' ★' : ''}</span><span class="lbl">${dims(h.input.w, h.input.h)} · ${nf0.format(h.input.quantity)} szt. · ${esc(h.input.sheetName)} · ${h.input.grammage} g · ${when(h)}</span></a><button type="button" class="use" data-repeat="${h.id}">Powtórz</button><button type="button" class="del" data-del="${h.id}" aria-label="Usuń z historii">${I.trash}</button></div>`;
     app.innerHTML = `
     <div class="screen">
-      <header class="top"><span class="title">Historia</span><span class="lbl">${S.history.length ? `${S.history.length} ${S.history.length === 1 ? 'obliczenie' : S.history.length < 5 ? 'obliczenia' : 'obliczeń'}` : ''}</span></header>
+      <header class="top">${backBtn()}<span class="title" style="flex:1">Historia</span><span class="lbl">${S.history.length ? `${S.history.length} ${S.history.length === 1 ? 'obliczenie' : S.history.length < 5 ? 'obliczenia' : 'obliczeń'}` : ''}</span></header>
       <div class="seg inv" role="group" aria-label="Filtr" style="grid-template-columns:repeat(2,minmax(0,1fr))"><button type="button" class="${histFilter === 'all' ? 'on' : ''}" data-f="all">Wszystkie</button><button type="button" class="${histFilter === 'star' ? 'on' : ''}" data-f="star">Zapisane ★</button></div>
       ${groups.length ? groups.map(([t, list]) => `<div class="sec">${t}</div><div class="stack8">${list.map(row).join('')}</div>`).join('') : `<div class="empty">${histFilter === 'star' ? 'Brak zapisanych obliczeń. Dotknij zakładki przy wyniku, aby zapisać.' : 'Historia jest pusta. Obliczenia trafiają tu po otwarciu karty zlecenia.'}</div>`}
-      ${tabsHTML('hist')}
     </div>`;
     app.querySelectorAll('[data-f]').forEach((b) => b.addEventListener('click', () => { histFilter = b.dataset.f; renderHistory(); }));
     app.querySelectorAll('[data-repeat]').forEach((b) => b.addEventListener('click', () => { const h = S.history.find((x) => x.id === b.dataset.repeat); loadFromHistory(h); S.current.historyId = null; S.current.name = ''; persist(); location.hash = '#/'; }));

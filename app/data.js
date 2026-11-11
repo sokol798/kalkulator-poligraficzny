@@ -184,7 +184,7 @@
 
   const DEFAULT_CURRENT = {
     formatId: 'a5', w: 148, h: 210, bleed: 3, quantity: 1000,
-    sheetId: 'b2', grammage: 130, orientation: 'auto', name: '', historyId: null,
+    sheetId: 'b2', grammage: 130, orientation: 'auto', name: '', historyId: null, gm: null,
   };
 
   function load() {
@@ -206,5 +206,7 @@
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* tryb prywatny: bez zapisu */ }
   }
 
-  root.Data = { KEY, STANDARD_FORMATS, STANDARD_SHEETS, DEFAULT_SETTINGS, DEFAULT_CURRENT, load, save };
+  const CONTACT_EMAIL = 'jerzy.owczak@gmail.com';
+
+  root.Data = { KEY, CONTACT_EMAIL, STANDARD_FORMATS, STANDARD_SHEETS, DEFAULT_SETTINGS, DEFAULT_CURRENT, load, save };
 })(window);
