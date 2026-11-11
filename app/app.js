@@ -459,13 +459,13 @@
         </div>
       </div>
       <div class="card rows" style="margin-top:10px">
-        <div class="rrow"><span class="lbl">Format netto</span><span class="v">${dims(c.w, c.h)}${c.formatId ? ` (${esc(formatLabel())})` : ''}</span></div>
-        <div class="rrow"><span class="lbl">Ze spadami ${dim(c.bleed)} ${unit()}</span><span class="v">${dims(r.layout.gross.w, r.layout.gross.h)}</span></div>
-        <div class="rrow"><span class="lbl">Arkusz · ${sh.gripper ? 'chwyt' : 'margines'}</span><span class="v">${esc(sh.name)} ${dims(sh.w, sh.h)} · ${dim(sh.gripper || sh.margin)} ${unit()}</span></div>
+        <div class="rrow"><span class="lbl">Format netto</span><span class="v">${c.formatId ? `${esc(formatLabel())} (${dims(c.w, c.h)})` : dims(c.w, c.h)}</span></div>
+        <div class="rrow"><span class="lbl">Ze spadami</span><span class="v">${dim(c.bleed)} ${unit()}</span></div>
+        <div class="rrow"><span class="lbl">Arkusz netto</span><span class="v">${esc(sh.name)} (${dims(sh.w, sh.h)})</span></div>
+        <div class="rrow"><span class="lbl">${sh.gripper ? 'Z chwytem' : 'Z marginesem'}</span><span class="v">${dim(sh.gripper || sh.margin)} ${unit()}</span></div>
         <div class="rrow"><span class="lbl">Wykorzystanie · ostatni arkusz</span><span class="v">${nf0.format(r.utilization * 100)} % · ${r.lastSheet} ${r.lastSheet === 1 ? 'użytek' : 'użytki'}</span></div>
         ${r.exact !== r.sheets ? `<div class="rrow"><span class="lbl">Dokładnie</span><span class="v">${nf2.format(r.exact)} ark. → zaokrąglone ${S.settings.rounding === 'ten' ? 'do 10' : 'w górę'}</span></div>` : ''}
         <div class="rrow"><span class="lbl">Waga arkuszy (${nf0.format(r.sheets)} × ${nf1.format(r.weight.sheet)} g)</span><span class="v">${kg(r.weight.sheetsTotal)}</span></div>
-        <div class="rrow"><span class="lbl">Waga 1 szt. / nakładu</span><span class="v">${nf1.format(r.weight.piece)} g / ${kg(r.weight.piecesTotal)}</span></div>
         <div class="rrow"><span class="lbl">Data</span><span class="v">${dateStr}</span></div>
       </div>
       <div class="row2 no-print" style="gap:8px;margin-top:10px">
@@ -490,12 +490,12 @@
   function cardText(r, sh, c) {
     return [
       c.name ? `${c.name}` : 'Karta zlecenia',
-      `Format: ${dims(c.w, c.h)}${c.formatId ? ` (${formatLabel()})` : ''}, spady ${dim(c.bleed)} ${unit()} → ${dims(r.layout.gross.w, r.layout.gross.h)}`,
+      `Format netto: ${c.formatId ? `${formatLabel()} (${dims(c.w, c.h)})` : dims(c.w, c.h)}, ze spadami ${dim(c.bleed)} ${unit()}`,
       `Nakład: ${nf0.format(r.quantity)} szt.`,
-      `Arkusz: ${sh.name} ${dims(sh.w, sh.h)}, ${sh.gripper ? 'chwyt' : 'margines'} ${dim(sh.gripper || sh.margin)} ${unit()}`,
+      `Arkusz netto: ${sh.name} (${dims(sh.w, sh.h)}), ${sh.gripper ? 'z chwytem' : 'z marginesem'} ${dim(sh.gripper || sh.margin)} ${unit()}`,
       `Na arkuszu: ${r.perSheet} (${r.layout.chosen.cols} × ${r.layout.chosen.rows}), wykorzystanie ${nf0.format(r.utilization * 100)} %`,
       `Arkuszy: ${nf0.format(r.sheets)} (ostatni: ${r.lastSheet})`,
-      `Papier: ${r.grammage} g/m², arkusze ${kg(r.weight.sheetsTotal)}, 1 szt. ${nf1.format(r.weight.piece)} g, nakład ${kg(r.weight.piecesTotal)}`,
+      `Papier: ${r.grammage} g/m², waga arkuszy ${kg(r.weight.sheetsTotal)}`,
     ].join('\n');
   }
 
