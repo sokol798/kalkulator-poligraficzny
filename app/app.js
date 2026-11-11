@@ -458,10 +458,10 @@
         </div>
       </div>
       <div class="card rows" style="margin-top:10px">
-        <div class="rrow"><span class="lbl">Format netto</span><span class="v">${c.formatId ? `${esc(formatLabel())} (${dims(c.w, c.h)})` : dims(c.w, c.h)}</span></div>
-        <div class="rrow"><span class="lbl">Ze spadami</span><span class="v">${dim(c.bleed)} ${unit()}</span></div>
+        <div class="rrow"><span class="lbl">Format netto</span><span class="v">${c.formatId ? `${esc(formatLabel())} (${dims(r.layout.gross.w, r.layout.gross.h)})` : dims(r.layout.gross.w, r.layout.gross.h)}</span></div>
+        <div class="rrow"><span class="lbl">Ze spadami</span><span class="v">${c.bleed ? `+${dim(c.bleed)}` : '0'} ${unit()}</span></div>
         <div class="rrow"><span class="lbl">Arkusz netto</span><span class="v">${esc(sh.name)} (${dims(sh.w, sh.h)})</span></div>
-        <div class="rrow"><span class="lbl">${sh.gripper ? 'Z chwytem' : 'Z marginesem'}</span><span class="v">${dim(sh.gripper || sh.margin)} ${unit()}</span></div>
+        <div class="rrow"><span class="lbl">${sh.gripper ? 'Z chwytem' : 'Z marginesem'}</span><span class="v">${(sh.gripper || sh.margin) ? `+${dim(sh.gripper || sh.margin)}` : '0'} ${unit()}</span></div>
         <div class="rrow"><span class="lbl">Wykorzystanie · ostatni arkusz</span><span class="v">${nf0.format(r.utilization * 100)} % · ${r.lastSheet} ${r.lastSheet === 1 ? 'użytek' : 'użytki'}</span></div>
         <div class="rrow"><span class="lbl">Waga arkuszy (${nf0.format(r.sheets)} × ${nf1.format(r.weight.sheet)} g)</span><span class="v">${kg(r.weight.sheetsTotal)}</span></div>
         <div class="rrow"><span class="lbl">Data</span><span class="v">${dateStr}</span></div>
@@ -488,9 +488,9 @@
   function cardText(r, sh, c) {
     return [
       c.name ? `${c.name}` : 'Karta zlecenia',
-      `Format netto: ${c.formatId ? `${formatLabel()} (${dims(c.w, c.h)})` : dims(c.w, c.h)}, ze spadami ${dim(c.bleed)} ${unit()}`,
+      `Format netto: ${c.formatId ? `${formatLabel()} (${dims(r.layout.gross.w, r.layout.gross.h)})` : dims(r.layout.gross.w, r.layout.gross.h)}, ze spadami +${dim(c.bleed)} ${unit()}`,
       `Nakład: ${nf0.format(r.quantity)} szt.`,
-      `Arkusz netto: ${sh.name} (${dims(sh.w, sh.h)}), ${sh.gripper ? 'z chwytem' : 'z marginesem'} ${dim(sh.gripper || sh.margin)} ${unit()}`,
+      `Arkusz netto: ${sh.name} (${dims(sh.w, sh.h)}), ${sh.gripper ? 'z chwytem' : 'z marginesem'} +${dim(sh.gripper || sh.margin)} ${unit()}`,
       `Na arkuszu: ${r.perSheet} (${r.layout.chosen.cols} × ${r.layout.chosen.rows}), wykorzystanie ${nf0.format(r.utilization * 100)} %`,
       `Arkuszy: ${nf0.format(r.sheets)} (ostatni: ${r.lastSheet})`,
       `Papier: ${r.grammage} g/m², waga arkuszy ${kg(r.weight.sheetsTotal)}`,
