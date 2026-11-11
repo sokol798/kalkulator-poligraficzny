@@ -210,7 +210,7 @@
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* tryb prywatny: bez zapisu */ }
   }
 
-  const CONTACT_EMAIL = 'jerzy.owczak@gmail.com';
+  const CONTACT_EMAIL = 'kontakt.kalkulator@gmail.com';
 
   root.Data = { KEY, CONTACT_EMAIL, STANDARD_FORMATS, STANDARD_SHEETS, DEFAULT_SETTINGS, DEFAULT_CURRENT, load, save };
 })(window);
