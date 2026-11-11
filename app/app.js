@@ -167,7 +167,7 @@
       <div class="card stack8">
         <div class="lbl">E-mail</div>
         <div style="font-size:17px;font-weight:600;word-break:break-all" id="mailTxt">${esc(mail)}</div>
-        <p class="hint">Napisz, jeśli brakuje formatu lub arkusza, coś się źle liczy albo masz pomysł na funkcję.</p>
+        
       </div>
       <div class="actions" style="margin-top:4px"><a class="btn" href="mailto:${esc(mail)}?subject=${encodeURIComponent('Kalkulator Poligraficzny')}">Napisz e-mail</a><button type="button" class="btn light auto" id="copyMail">Kopiuj</button></div>
       <p class="hint" style="margin:8px 4px 0">Kalkulator Poligraficzny · wersja 1.2 · dane są przechowywane tylko w tej przeglądarce.</p>`);
@@ -211,7 +211,6 @@
     const isOffset = sh.group === 'offset';
     const gms = isOffset ? [0, 8, 10, 12] : [0, 3, 5, 10];
     const gmCur = isOffset ? sh.gripper : sh.margin;
-    const hint = (t) => S.settings.hints ? `<p class="hint">${t}</p>` : '';
     const noFit = r.perSheet === 0;
     const entry = c.historyId ? S.history.find((x) => x.id === c.historyId) : null;
 
@@ -220,7 +219,7 @@
       <header class="top"><span class="title" style="flex:1">Kalkulator Poligraficzny</span>${logoBtn()}</header>
       <form class="stack" id="f" autocomplete="off" onsubmit="return false">
         <div class="card stack">
-          <div><span class="lbl">Format użytku</span>${hint('Użytek to jedna gotowa, przycięta praca, np. ulotka. Wybierz gotowy format albo wpisz wymiar netto, bez spadów.')}</div>
+          <div><span class="lbl">Format użytku</span></div>
           <div class="chiprow">
             <div class="chips scroll">
               ${quickIds.map((id) => { const f = formatById(id); return `<button type="button" class="chip ${c.formatId === id ? 'on' : ''}" data-format="${id}" title="${dims(f.w, f.h)}">${esc(f.name)}</button>`; }).join('')}
@@ -242,7 +241,7 @@
               <button type="button" class="num sm qbtn" id="q" aria-label="Nakład ${nf0.format(c.quantity)} sztuk, dotknij aby zmienić">${nf0.format(c.quantity)}</button>
               <button type="button" class="step" data-step="${step}" aria-label="Więcej o ${step}">+</button>
             </div>
-            ${hint('Ile sztuk ma być wydrukowanych. Dotknij liczby, aby ustawić suwakiem.')}
+            
           </div>
           <div class="card stack8">
             <span class="lbl">Arkusz</span>
@@ -250,7 +249,7 @@
               ${quickSheetIds.map((id) => { const s = sheetById(id); return `<button type="button" class="chip sm ${sh.id === id ? 'on' : ''}" data-sheet="${id}" title="${dims(s.w, s.h)}">${esc(s.name)}</button>`; }).join('')}
               <button type="button" class="chip sm more" data-open="sheet">Więcej ${I.chev}</button>
             </div>
-            ${hint('Papier, który wchodzi do maszyny. Na nim układamy użytki.')}
+            
           </div>
         </div>
         <div class="card stack8">
@@ -259,7 +258,7 @@
             ${grams.map((g) => `<button type="button" class="chip sm ${c.grammage === g ? 'on' : ''}" data-gram="${g}">${g}</button>`).join('')}
             <input class="num pill ${gramCustom ? 'on' : ''}" id="g" inputmode="numeric" placeholder="inna" value="${gramCustom ? c.grammage : ''}" aria-label="Inna gramatura" style="width:64px;flex-shrink:0;margin-left:auto">
           </div>
-          ${hint('Gramatura, czyli waga metra kwadratowego papieru. Służy tylko do policzenia wagi nakładu.')}
+          
         </div>
         <div class="row2">
           <div class="card stack8">
@@ -268,7 +267,7 @@
               ${bleeds.map((v) => `<button type="button" class="chip sm ${c.bleed === v ? 'on' : ''}" data-bleed="${v}">${dim(v)}</button>`).join('')}
               <input class="num pill ${bleeds.includes(c.bleed) ? '' : 'on'}" id="bl" inputmode="decimal" placeholder="inne" value="${bleeds.includes(c.bleed) ? '' : fromMm(c.bleed)}" aria-label="Inny spad" style="width:56px">
             </div>
-            ${hint('Zapas obrazu poza formatem, z każdej strony. Zwykle 2–3 mm.')}
+            
           </div>
           <div class="card stack8">
             <span class="lbl">${isOffset ? 'Chwyt' : 'Margines'} (${unit()})</span>
@@ -276,7 +275,7 @@
               ${gms.map((v) => `<button type="button" class="chip sm ${gmCur === v ? 'on' : ''}" data-gm="${v}">${dim(v)}</button>`).join('')}
               <input class="num pill ${gms.includes(gmCur) ? '' : 'on'}" id="gmi" inputmode="decimal" placeholder="inne" value="${gms.includes(gmCur) ? '' : fromMm(gmCur)}" aria-label="Inny ${isOffset ? 'chwyt' : 'margines'}" style="width:56px">
             </div>
-            ${hint(isOffset ? 'Pas u góry arkusza, którego łapy maszyny nie zadrukują.' : 'Pas niezadrukowany z każdej strony arkusza.')}
+            
           </div>
         </div>
         <div class="card stack8">
@@ -285,13 +284,13 @@
             <button type="button" class="chip wide ${c.orientation === 'portrait' ? 'on' : ''}" data-orient="portrait">Pion</button>
             <button type="button" class="chip wide ${c.orientation === 'landscape' ? 'on' : ''}" data-orient="landscape">Poziom</button>
           </div>
-          ${hint('Jak obrócić użytek na arkuszu: pion – jak format, poziom – obrócony o 90°.')}
+          
         </div>
       </form>
       <div class="bottom">
         ${noFit ? `<div class="warn" style="margin:0 4px 10px">Użytek ${dims(r.layout.gross.w, r.layout.gross.h)} ze spadami nie mieści się na arkuszu ${esc(sh.name)}.</div>` : ''}
         <button type="button" class="btn big" id="calc" ${noFit ? 'disabled' : ''}>Oblicz ${I.arrow}</button>
-        ${hint('Wynik otworzy się jako karta zlecenia: liczba arkuszy, rozkład na arkuszu, waga papieru. Tam ją zapiszesz lub udostępnisz.')}
+        
       </div>
     </div>`;
 
@@ -664,7 +663,7 @@
     const def = sheetById(s.defaultSheetId) || Data.STANDARD_SHEETS[0];
     const seg = (name, vals, cur, fmt) => `<div class="seg" role="group" aria-label="${name}" style="grid-template-columns:repeat(${vals.length},minmax(0,1fr))">${vals.map((v) => `<button type="button" class="${String(cur) === String(v) ? 'on' : ''}" data-set="${name}" data-v="${v}">${fmt ? fmt(v) : v}</button>`).join('')}</div>`;
     const sw = (id, on, label) => `<button type="button" class="sw ${on ? 'on' : ''}" role="switch" aria-checked="${on}" aria-label="${label}" id="${id}"><i></i></button>`;
-    const set = (title, value, hint, control) => `<div class="set"><div class="set-h"><span class="set-t">${title}</span>${value != null ? `<span class="set-v">${value}</span>` : ''}</div>${hint ? `<p class="hint">${hint}</p>` : ''}${control || ''}</div>`;
+    const set = (title, value, hint, control) => `<div class="set"><div class="set-h"><span class="set-t">${title}</span>${value != null ? `<span class="set-v">${value}</span>` : ''}</div>${control || ''}</div>`;
     const ex = Calc.calculate({ format: { w: 148, h: 210 }, sheet: def, bleed: s.bleed, quantity: 1000, grammage: s.grammage, orientation: s.orientation, rounding: 'up' });
     const grams = [80, 130, 170, 300];
     const nCustom = S.customFormats.length + S.customSheets.length;
@@ -677,7 +676,7 @@
         ${set('Spady', `${dim(s.bleed)} ${unit()}`, 'Zapas obrazu poza formatem netto, dodawany z każdej strony użytku. Zwykle 2–3 mm; przy etykietach i opakowaniach więcej.', seg('bleed', [0, 2, 3, 5], s.bleed, dim))}
         ${set('Chwyt maszyny', `${dim(s.gripper)} ${unit()}`, 'Pas u góry arkusza, którego łapy maszyny offsetowej nie zadrukują. Używany przy dodawaniu własnych arkuszy offsetowych.', seg('gripper', [0, 8, 10, 12], s.gripper, dim))}
         ${set('Orientacja użytku', null, 'Domyślne ułożenie użytku na arkuszu w nowych obliczeniach. W kalkulatorze zmienisz je dla pojedynczego zlecenia.', seg('orientation', ['portrait', 'landscape'], s.orientation, (v) => ({ portrait: 'Pion', landscape: 'Poziom' }[v])))}
-        <a href="#/biblioteka/arkusze" class="set link"><div class="set-h"><span class="set-t">Arkusz domyślny</span><span class="set-v">${esc(def.name)} ›</span></div><p class="hint">${dims(def.w, def.h)} · ${def.gripper ? `chwyt ${dim(def.gripper)}` : `margines ${dim(def.margin)}`} ${unit()}. Wybierany automatycznie w nowych obliczeniach. Zmienisz go w bibliotece arkuszy.</p></a>
+        <a href="#/biblioteka/arkusze" class="set link"><div class="set-h"><span class="set-t">Arkusz domyślny</span><span class="set-v">${esc(def.name)} ›</span></div></a>
       </div>
 
       <div class="sec">Nakład i wynik</div>
@@ -690,23 +689,22 @@
       <div class="sec">Aplikacja</div>
       <div class="card sets">
         ${set('Jednostka', s.unit, 'Wymiary we wszystkich polach i listach. Dane są zapisane w milimetrach, więc przełączenie nic nie psuje.', seg('unit', ['mm', 'cm'], s.unit))}
-        <div class="set row"><div><div class="set-t">Podpowiedzi w kalkulatorze</div><p class="hint">Krótkie opisy pod każdym kafelkiem: co wpisać i co oznacza wynik.</p></div>${sw('hints', s.hints, 'Podpowiedzi w kalkulatorze')}</div>
-        <div class="set row"><div><div class="set-t">Zapisuj w historii</div><p class="hint">Każda otwarta karta zlecenia trafia do historii automatycznie. Wyłącz, aby zapisywać tylko zakładką.</p></div>${sw('auto', s.autoHistory, 'Zapisuj w historii')}</div>
+        <div class="set row"><div><div class="set-t">Zapisuj w historii</div></div>${sw('auto', s.autoHistory, 'Zapisuj w historii')}</div>
       </div>
 
       <div class="sec">Dane</div>
       <div class="card sets">
-        <button type="button" class="set link" id="csv"><div class="set-h"><span class="set-t">Eksport historii (CSV)</span><span class="set-v">${S.history.length} ›</span></div><p class="hint">Plik do Excela lub arkusza Google: format, nakład, arkusz, liczba arkuszy, waga.</p></button>
-        <button type="button" class="set link" id="backup"><div class="set-h"><span class="set-t">Kopia zapasowa</span><span class="set-v">›</span></div><p class="hint">Plik JSON z historią, własnymi formatami i arkuszami oraz ustawieniami. Przenieś go na inny telefon lub komputer.</p></button>
-        <button type="button" class="set link" id="restore"><div class="set-h"><span class="set-t">Przywróć z kopii</span><span class="set-v">›</span></div><p class="hint">Wczytuje plik kopii zapasowej i zastępuje nim obecne dane.</p></button>
+        <button type="button" class="set link" id="csv"><div class="set-h"><span class="set-t">Eksport historii (CSV)</span><span class="set-v">${S.history.length} ›</span></div></button>
+        <button type="button" class="set link" id="backup"><div class="set-h"><span class="set-t">Kopia zapasowa</span><span class="set-v">›</span></div></button>
+        <button type="button" class="set link" id="restore"><div class="set-h"><span class="set-t">Przywróć z kopii</span><span class="set-v">›</span></div></button>
         <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
-        <button type="button" class="set link danger" id="reset"><div class="set-h"><span class="set-t">Wyczyść dane</span><span class="set-v">›</span></div><p class="hint">Usuwa historię (${S.history.length}) oraz własne formaty i arkusze (${nCustom}). Ustawienia zostają.</p></button>
+        <button type="button" class="set link danger" id="reset"><div class="set-h"><span class="set-t">Wyczyść dane</span><span class="set-v">›</span></div></button>
       </div>
 
       <div class="sec">Pomoc</div>
       <div class="card sets">
-        <a href="#/pomoc" class="set link"><div class="set-h"><span class="set-t">Jak liczymy użytki</span><span class="set-v">›</span></div><p class="hint">Krok po kroku: spady, chwyt, użytki na arkuszu, liczba arkuszy, wykorzystanie i waga.</p></a>
-        <div class="set"><div class="set-h"><span class="set-t">Kalkulator Poligraficzny</span><span class="set-v">wersja 1.1</span></div><p class="hint">${Data.STANDARD_FORMATS.length} formatów i ${Data.STANDARD_SHEETS.length} arkuszy w bibliotece. Działa offline po dodaniu do ekranu początkowego. Dane są przechowywane tylko w tej przeglądarce.</p></div>
+        <a href="#/pomoc" class="set link"><div class="set-h"><span class="set-t">Jak liczymy użytki</span><span class="set-v">›</span></div></a>
+        <div class="set"><div class="set-h"><span class="set-t">Kalkulator Poligraficzny</span><span class="set-v">wersja 1.1</span></div></div>
       </div>
       <div class="bottom"><a href="#/" class="btn">Gotowe</a></div>
     </div>`;
@@ -721,7 +719,6 @@
     app.querySelector('#gram').addEventListener('change', (e) => { const v = parseInt0(e.target.value); if (v) applySetting('grammage', v); else renderSettings(); });
     app.querySelector('#gram').addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
     app.querySelector('#auto').addEventListener('click', () => { s.autoHistory = !s.autoHistory; persist(); renderSettings(); });
-    app.querySelector('#hints').addEventListener('click', () => { s.hints = !s.hints; persist(); renderSettings(); });
     app.querySelector('#csv').addEventListener('click', exportCSV);
     app.querySelector('#backup').addEventListener('click', () => { download(`kalkulator-kopia-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(S, null, 1), 'application/json'); toast('Kopia zapasowa pobrana'); });
     app.querySelector('#restore').addEventListener('click', () => app.querySelector('#restoreFile').click());

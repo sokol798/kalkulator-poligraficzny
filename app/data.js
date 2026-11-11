@@ -179,7 +179,7 @@
   const DEFAULT_SETTINGS = {
     bleed: 3, gripper: 10, grammage: 130, defaultSheetId: 'b2',
     orientation: 'portrait', rounding: 'up', autoHistory: true, unit: 'mm',
-    hints: true, step: 100,
+    step: 100,
   };
 
   const DEFAULT_CURRENT = {
