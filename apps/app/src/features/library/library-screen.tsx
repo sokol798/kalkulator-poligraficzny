@@ -23,7 +23,7 @@ export function LibraryScreen() {
 
   return (
     <Screen
-      bottomInset={TAB_BAR_HEIGHT + spacing.md}
+      bottomInset={TAB_BAR_HEIGHT + spacing.md} footer
       header={
         <TabHeader
           title={t.library.title}

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BookmarkIcon, ChevronDown, ChevronRight, GearIcon } from '@/components/icons';
+import { FunctionsMenu, MenuTitle } from '@/features/calculator/functions-menu';
 import { NumberField } from '@/components/number-field';
 import { SheetPreview } from '@/components/sheet-preview';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
@@ -31,6 +32,7 @@ export function CalculatorScreen() {
   const calc = useCalculation();
   useAutoSave(calc);
   const [customGrammage, setCustomGrammage] = useState(!QUICK_GRAMMAGES.includes(inputs.grammage));
+  const [menuOpen, setMenuOpen] = useState(false);
 
   /* Liczba użytków dla każdej orientacji (etykiety segmentów). */
   const upsBy = useMemo(() => {
@@ -56,9 +58,10 @@ export function CalculatorScreen() {
   return (
     <Screen
       bottomInset={TAB_BAR_HEIGHT + spacing.md}
+      footer
       header={
         <TabHeader
-          title={t.calc.title}
+          title={<MenuTitle title={t.calc.title} open={menuOpen} onToggle={() => setMenuOpen((v) => !v)} />}
           right={
             <IconButton accessibilityLabel={t.settings.title} onPress={() => router.push('/settings')}>
               <GearIcon color={theme.ink} />
@@ -66,6 +69,16 @@ export function CalculatorScreen() {
           }
         />
       }>
+      {menuOpen ? (
+        <FunctionsMenu
+          onClose={() => setMenuOpen(false)}
+          onNewCalculation={() => {
+            useAppStore.getState().newCalculation();
+            setCustomGrammage(false);
+          }}
+          cardDisabled={!calc.ups}
+        />
+      ) : null}
       {/* Format użytku */}
       <Card>
         <View style={styles.chips}>

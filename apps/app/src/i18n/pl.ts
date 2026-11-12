@@ -170,5 +170,7 @@ export const t = {
       ['Waga papieru', 'Waga arkusza = powierzchnia w m² × gramatura. Waga nakładu = powierzchnia użytku netto × gramatura × nakład.'],
     ] as const,
   },
+  menu: { open: 'Pokaż funkcje', close: 'Ukryj funkcje', card: 'Karta zlecenia', newCalc: 'Nowe obliczenie', library: 'Biblioteka', history: 'Historia', settings: 'Ustawienia', help: 'Jak liczymy' },
+  footer: { owner: 'Jerzy Owczak', rights: 'Wszelkie prawa zastrzeżone' },
   common: { back: 'Wstecz', close: 'Zamknij', mm: 'mm', cm: 'cm', pcs: 'szt.', ok: 'OK' },
 } as const;

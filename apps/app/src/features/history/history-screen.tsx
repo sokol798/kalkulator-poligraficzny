@@ -42,7 +42,7 @@ export function HistoryScreen() {
   };
 
   return (
-    <Screen bottomInset={TAB_BAR_HEIGHT + spacing.md} header={<TabHeader title={t.history.title} right={<Label>{t.history.range}</Label>} />}>
+    <Screen bottomInset={TAB_BAR_HEIGHT + spacing.md} footer header={<TabHeader title={t.history.title} right={<Label>{t.history.range}</Label>} />}>
       <Segmented<Filter> surface value={filter} onChange={setFilter} options={[{ value: 'all', label: t.history.all }, { value: 'starred', label: t.history.starred }]} />
       {groups.length === 0 ? <Empty>{filter === 'starred' ? t.history.emptyStarred : t.history.empty}</Empty> : null}
       {groups.map((g) => (

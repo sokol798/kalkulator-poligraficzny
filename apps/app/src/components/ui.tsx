@@ -20,13 +20,14 @@ export function Text({ variant = 'body', color = 'ink', style, ...rest }: TextPr
 }
 
 /** Ekran z przewijaniem; `bottomInset` zostawia miejsce na pływający pasek zakładek. */
-export function Screen({ children, header, bottomInset = 0, scroll = true, style }: PropsWithChildren<{ header?: ReactNode; bottomInset?: number; scroll?: boolean; style?: StyleProp<ViewStyle> }>) {
+export function Screen({ children, header, bottomInset = 0, scroll = true, style, footer }: PropsWithChildren<{ header?: ReactNode; bottomInset?: number; scroll?: boolean; style?: StyleProp<ViewStyle>; footer?: boolean }>) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const body = (
     <View style={[styles.content, style]}>
       {header}
       {children}
+      {footer ? <Footer /> : null}
     </View>
   );
   return (
@@ -47,10 +48,10 @@ export function Screen({ children, header, bottomInset = 0, scroll = true, style
 }
 
 /** Nagłówek ekranu zakładki: duży tytuł + akcja po prawej. */
-export function TabHeader({ title, right }: { title: string; right?: ReactNode }) {
+export function TabHeader({ title, right }: { title: ReactNode; right?: ReactNode }) {
   return (
     <View style={styles.header}>
-      <Text variant="screenTitle">{title}</Text>
+      {typeof title === 'string' ? <Text variant="screenTitle">{title}</Text> : title}
       {right ?? <View style={{ width: layout.control }} />}
     </View>
   );
@@ -266,6 +267,17 @@ export function Hairline() {
   return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: theme.border }} />;
 }
 
+/** Stopka z informacją o prawach autorskich. */
+export function Footer() {
+  return (
+    <View style={styles.footer}>
+      <Text variant="small" color="muted" style={{ textAlign: 'center' }}>
+        {`© ${new Date().getFullYear()} ${t.footer.owner} ® · ${t.footer.rights}`}
+      </Text>
+    </View>
+  );
+}
+
 export function Empty({ children }: PropsWithChildren) {
   return (
     <Card style={{ alignItems: 'center', paddingVertical: spacing.xl }}>
@@ -278,6 +290,7 @@ export function Empty({ children }: PropsWithChildren) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
+  footer: { paddingTop: spacing.lg, paddingBottom: spacing.sm, alignItems: 'center' },
   scroll: { flexGrow: 1, alignItems: 'center', paddingHorizontal: layout.pagePadding },
   content: { width: '100%', maxWidth: layout.maxContentWidth, gap: spacing.md },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: layout.control, marginBottom: spacing.xs },
