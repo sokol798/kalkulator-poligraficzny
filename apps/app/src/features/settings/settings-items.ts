@@ -82,21 +82,17 @@ export const SETTINGS_ITEMS: SettingsItemDef[] = [
   {
     key: 'waste',
     title: 'Naddatek technologiczny',
-    hint: 'dolicza arkusze na rozruch i straty',
+    hint: 'domyślny naddatek dla nowych obliczeń; dolicza arkusze na rozruch i straty',
     fields: [
-      { kind: 'toggle', key: 'wasteEnabled', title: 'Licz naddatek', hint: 'pokazuje naddatek w kalkulatorze i na karcie' },
-      { kind: 'choice', key: 'wastePercent', title: 'Naddatek domyślny', options: WASTE_OPTIONS.map((v) => ({ value: v, label: `${v} %` })), custom: { decimals: 1, unit: '%', max: 100 } },
-      { kind: 'number', key: 'wasteMinSheets', title: 'Minimum arkuszy naddatku', hint: 'nie mniej niż tyle arkuszy, niezależnie od procentu', decimals: 0, unit: 'ark.', showIf: 'wasteEnabled' },
+      { kind: 'choice', key: 'wastePercent', title: 'Naddatek domyślny (0 = brak)', options: WASTE_OPTIONS.map((v) => ({ value: v, label: `${v} %` })), custom: { decimals: 1, unit: '%', max: 100 } },
+      { kind: 'number', key: 'wasteMinSheets', title: 'Minimum arkuszy naddatku', hint: 'gdy naddatek > 0: nie mniej niż tyle arkuszy', decimals: 0, unit: 'ark.' },
     ],
   },
   {
     key: 'price',
     title: 'Koszt papieru',
-    hint: 'cena za arkusz, pokazywana w wyniku',
-    fields: [
-      { kind: 'toggle', key: 'priceEnabled', title: 'Licz koszt papieru', hint: 'pole „Cena za arkusz” w kalkulatorze' },
-      { kind: 'number', key: 'pricePerSheet', title: 'Domyślna cena za arkusz', decimals: 2, unit: 'zł', showIf: 'priceEnabled' },
-    ],
+    hint: 'domyślna cena za arkusz dla nowych obliczeń (0 = nie licz)',
+    fields: [{ kind: 'number', key: 'pricePerSheet', title: 'Domyślna cena za arkusz', decimals: 2, unit: 'zł' }],
   },
   {
     key: 'theme',

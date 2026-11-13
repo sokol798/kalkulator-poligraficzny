@@ -13,7 +13,7 @@ import { useCalculation } from '@/hooks/use-calculation';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
 import { fmtDec, fmtInt } from '@/lib/format';
-import { BLEED_OPTIONS, MARGIN_TOP_OPTIONS, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, WASTE_OPTIONS } from '@/lib/library-data';
+import { BLEED_OPTIONS, MARGIN_TOP_OPTIONS, QUICK_FORMAT_IDS, QUICK_GRAMMAGES } from '@/lib/library-data';
 import { findFormat, useAppStore } from '@/store/app-store';
 import { spacing } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -55,7 +55,6 @@ export function CalculatorScreen() {
   const customBleed = !BLEED_OPTIONS.includes(inputs.bleed);
   const marginTop = calc.sheet.marginTop;
   const customMargin = !MARGIN_TOP_OPTIONS.includes(marginTop);
-  const customWaste = !WASTE_OPTIONS.includes(inputs.wastePercent);
 
   const onSave = () => {
     const id = saveCurrent(summaryOf(calc), currentEntryId ? undefined : { star: true });
@@ -118,23 +117,27 @@ export function CalculatorScreen() {
         <ValueTile label={t.calc.sheet} value={calc.sheet.name} sub={unit.fmtSize(calc.sheet.size.width, calc.sheet.size.height)} onPress={() => router.push('/pick-sheet')} accessibilityLabel={t.pickSheet.title} />
       </View>
 
-      {/* Cena za arkusz (opcjonalna) */}
-      {settings.priceEnabled ? (
-        <Pressable onPress={() => router.push('/edit-price')} accessibilityRole="button" accessibilityLabel={t.calc.editPrice} style={({ pressed }) => pressed && { opacity: 0.75 }}>
-          <Card style={styles.between}>
-            <View>
-              <Label>{t.calc.priceCard}</Label>
-              <Label style={{ fontSize: 11 }}>{inputs.pricePerSheet > 0 ? t.calc.tapToEdit : t.calc.priceHint}</Label>
-            </View>
-            <View style={styles.priceRow}>
-              <Text variant="value" color={inputs.pricePerSheet > 0 ? 'ink' : 'muted'}>
-                {inputs.pricePerSheet > 0 ? `${fmtDec(inputs.pricePerSheet, 2)} ${t.settings.pln}` : '—'}
-              </Text>
-              <ChevronRight color={theme.muted} size={12} />
-            </View>
-          </Card>
-        </Pressable>
-      ) : null}
+      {/* Cena za arkusz | Naddatek – kafelki */}
+      <View style={styles.twoCol}>
+        <ValueTile
+          label={t.calc.priceCard}
+          value={inputs.pricePerSheet > 0 ? fmtDec(inputs.pricePerSheet, 2) : '—'}
+          unit={inputs.pricePerSheet > 0 ? t.settings.pln : undefined}
+          muted={!(inputs.pricePerSheet > 0)}
+          sub={inputs.pricePerSheet > 0 ? undefined : t.calc.priceHint}
+          onPress={() => router.push('/edit-price')}
+          accessibilityLabel={t.calc.editPrice}
+        />
+        <ValueTile
+          label={t.calc.wasteCard}
+          value={inputs.wastePercent > 0 ? String(inputs.wastePercent).replace('.', ',') : '—'}
+          unit={inputs.wastePercent > 0 ? '%' : undefined}
+          muted={!(inputs.wastePercent > 0)}
+          sub={inputs.wastePercent > 0 ? undefined : t.calc.wasteHint}
+          onPress={() => router.push('/edit-waste')}
+          accessibilityLabel={t.calc.editWaste}
+        />
+      </View>
 
       {/* Papier */}
       <Card>
@@ -170,19 +173,6 @@ export function CalculatorScreen() {
           <Label style={{ fontSize: 11 }}>{t.calc.marginsSides(unit.fmtWithUnit(calc.sheet.marginSides))}</Label>
         </Card>
       </View>
-
-      {/* Naddatek (opcjonalny) */}
-      {settings.wasteEnabled ? (
-        <Card>
-          <Label>{t.calc.waste}</Label>
-          <View style={styles.chips}>
-            {WASTE_OPTIONS.map((w) => (
-              <Chip key={w} small label={`${w} %`} on={inputs.wastePercent === w} onPress={() => setInput('wastePercent', w)} />
-            ))}
-            {otherField({ value: inputs.wastePercent, isCustom: customWaste, onChange: (v) => setInput('wastePercent', v), decimals: 1, max: 100, label: t.calc.waste })}
-          </View>
-        </Card>
-      ) : null}
 
       {/* Wynik – po kliknięciu „Oblicz” */}
       {computed ? (
@@ -231,6 +221,16 @@ export function CalculatorScreen() {
           <PillButton title={t.calc.compute} onPress={compute} style={{ flex: 1 }} />
         )}
       </View>
+      {computed ? (
+        <PillButton
+          kind="secondary"
+          title={t.calc.reset}
+          onPress={() => {
+            useAppStore.getState().newCalculation();
+            setComputed(false);
+          }}
+        />
+      ) : null}
     </Screen>
   );
 }
@@ -247,7 +247,6 @@ const styles = StyleSheet.create({
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md },
   twoCol: { flexDirection: 'row', gap: spacing.md },
   col: { flex: 1, minWidth: 0 },
-  priceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   resultRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
   actions: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
 });

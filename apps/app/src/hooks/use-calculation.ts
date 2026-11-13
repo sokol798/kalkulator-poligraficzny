@@ -70,12 +70,12 @@ export function computeCalculation(inputs: CalcInputs, settings: Settings, myShe
   const ups = imposition.best?.ups ?? 0;
   const net = calculateSheets({ quantity: inputs.quantity, ups, wastePercent: 0, wasteMinSheets: 0 });
   const sheets = roundSheets(net.netSheets, settings.rounding);
-  const wasteSheets = settings.wasteEnabled && sheets > 0 ? Math.max(Math.ceil((sheets * Math.max(0, inputs.wastePercent)) / 100), Math.max(0, settings.wasteMinSheets)) : 0;
+  const wasteSheets = inputs.wastePercent > 0 && sheets > 0 ? Math.max(Math.ceil((sheets * inputs.wastePercent) / 100), Math.max(0, settings.wasteMinSheets)) : 0;
   const grossSheets = sheets + wasteSheets;
   const lastSheetUps = ups > 0 && net.netSheets > 0 ? inputs.quantity - (net.netSheets - 1) * ups : 0;
   const lastSheetPercent = ups > 0 ? Math.round((lastSheetUps / ups) * 100) : 0;
   const paper = calculatePaper({ sheet: sheet.size, grammage: inputs.grammage, sheets: grossSheets });
-  const cost = settings.priceEnabled && inputs.pricePerSheet > 0 ? round(grossSheets * inputs.pricePerSheet, 2) : null;
+  const cost = inputs.pricePerSheet > 0 ? round(grossSheets * inputs.pricePerSheet, 2) : null;
   const pieceWeightG = ((inputs.width * inputs.height) / 1_000_000) * inputs.grammage;
   return {
     sheet,

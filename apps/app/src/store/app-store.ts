@@ -21,12 +21,10 @@ export interface Settings {
   grammage: number;
   defaultSheetId: string;
   rounding: Rounding;
-  /** Naddatek technologiczny (opcjonalny). */
-  wasteEnabled: boolean;
+  /** Naddatek technologiczny domyślny (0 = brak). */
   wastePercent: number;
   wasteMinSheets: number;
-  /** Koszt papieru (opcjonalny), cena za arkusz. */
-  priceEnabled: boolean;
+  /** Domyślna cena za arkusz (0 = nie licz kosztu). */
   pricePerSheet: number;
   autoSave: boolean;
   unit: Unit;
@@ -41,14 +39,12 @@ export const DEFAULT_SETTINGS: Settings = {
   grammage: 130,
   defaultSheetId: 'sh-b1',
   rounding: 'up',
-  wasteEnabled: false,
-  wastePercent: 5,
+  wastePercent: 0,
   wasteMinSheets: 0,
-  priceEnabled: true,
   pricePerSheet: 0,
   autoSave: true,
   unit: 'mm',
-  theme: 'system',
+  theme: 'light',
 };
 
 export interface CustomSheet {
@@ -195,11 +191,22 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'printcalc-v3',
-      version: 5,
+      version: 6,
       migrate: (persisted, version) => {
         const st = persisted as Partial<AppState>;
         if (version < 4 && st.inputs) st.inputs = { ...st.inputs, marginTop: st.inputs.marginTop ?? null };
-        if (version < 5 && st.settings) st.settings = { ...DEFAULT_SETTINGS, ...st.settings, theme: st.settings.theme ?? 'system' };
+        if (version < 6 && st.settings) {
+          const old = st.settings as Partial<Settings> & { wasteEnabled?: boolean; priceEnabled?: boolean };
+          const { wasteEnabled, priceEnabled, ...rest } = old;
+          st.settings = {
+            ...DEFAULT_SETTINGS,
+            ...rest,
+            wastePercent: wasteEnabled ? (rest.wastePercent ?? 5) : 0,
+            pricePerSheet: priceEnabled ? (rest.pricePerSheet ?? 0) : 0,
+            theme: 'light',
+          };
+          if (st.inputs && !wasteEnabled) st.inputs = { ...st.inputs, wastePercent: 0 };
+        }
         return st as AppState;
       },
       storage: createJSONStorage(() => AsyncStorage),

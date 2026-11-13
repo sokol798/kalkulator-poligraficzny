@@ -63,16 +63,10 @@ export function SettingsScreen() {
           <Value>{`${s.grammage} g/m²`}</Value>
         </Row>
         <Row title={t.settings.waste} onPress={open('waste')}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-            <Toggle value={s.wasteEnabled} onChange={(v) => setSetting('wasteEnabled', v)} accessibilityLabel={t.settings.waste} />
-            <ChevronRight color={theme.muted} />
-          </View>
+          <Value>{s.wastePercent > 0 ? `${String(s.wastePercent).replace('.', ',')} %` : t.settings.off}</Value>
         </Row>
         <Row title={t.settings.price} onPress={open('price')} last>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
-            <Toggle value={s.priceEnabled} onChange={(v) => setSetting('priceEnabled', v)} accessibilityLabel={t.settings.price} />
-            <ChevronRight color={theme.muted} />
-          </View>
+          <Value>{s.pricePerSheet > 0 ? `${s.pricePerSheet.toFixed(2).replace('.', ',')} ${t.settings.pln}` : t.settings.off}</Value>
         </Row>
       </Card>
 

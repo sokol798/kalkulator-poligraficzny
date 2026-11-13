@@ -24,16 +24,17 @@ export const HistoryIcon = ({ size = 18, color }: P) => (
     <Path d="M9 5v4l3 2" fill="none" stroke={color} strokeWidth={1.5} />
   </Svg>
 );
-export const GearIcon = ({ size = 18, color }: P) => (
+export const GearIcon = ({ size = 20, color }: P) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx={12} cy={12} r={3} fill="none" stroke={color} strokeWidth={1.8} />
     <Path
-      d="M10.3 2.5h3.4l.5 2.6c.6.2 1.2.5 1.7 1l2.5-.9 1.7 2.9-2 1.7c.1.6.1 1.2 0 1.8l2 1.7-1.7 2.9-2.5-.9c-.5.4-1.1.7-1.7 1l-.5 2.6h-3.4l-.5-2.6c-.6-.2-1.2-.5-1.7-1l-2.5.9-1.7-2.9 2-1.7c-.1-.6-.1-1.2 0-1.8l-2-1.7 1.7-2.9 2.5.9c.5-.4 1.1-.7 1.7-1z"
+      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
       fill="none"
       stroke={color}
-      strokeWidth={1.6}
+      strokeWidth={1.8}
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <Circle cx={12} cy={12} r={3} fill="none" stroke={color} strokeWidth={1.6} />
   </Svg>
 );
 export const ChevronDown = ({ size = 10, color }: P) => (

@@ -42,6 +42,7 @@ export default function RootLayout() {
         <Stack.Screen name="pick-sheet" options={sheet} />
         <Stack.Screen name="edit-quantity" options={sheet} />
         <Stack.Screen name="edit-price" options={sheet} />
+        <Stack.Screen name="edit-waste" options={sheet} />
         <Stack.Screen name="card" />
         <Stack.Screen name="new-format" />
         <Stack.Screen name="new-sheet" />
