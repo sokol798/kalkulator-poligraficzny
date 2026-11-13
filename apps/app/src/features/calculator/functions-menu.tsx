@@ -44,7 +44,6 @@ export function FunctionsMenu({ onClose, onNewCalculation, cardDisabled }: MenuP
     { label: t.menu.library, icon: <LibraryIcon color={theme.ink} />, onPress: go(() => router.navigate('/library')) },
     { label: t.menu.history, icon: <HistoryIcon color={theme.ink} />, onPress: go(() => router.navigate('/history')) },
     { label: t.menu.settings, icon: <GearIcon color={theme.ink} />, onPress: go(() => router.push('/settings')) },
-    { label: t.menu.help, icon: <GearIcon color={theme.ink} />, onPress: go(() => router.push('/help')) },
   ];
   return (
     <Card style={{ paddingVertical: 4, gap: 0 }} accessibilityRole="menu">

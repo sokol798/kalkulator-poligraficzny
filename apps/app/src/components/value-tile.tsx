@@ -12,11 +12,13 @@ interface Props {
   value: string;
   unit?: string;
   muted?: boolean;
+  /** Dodatkowy opis pod wartością (zamiast podpowiedzi „dotknij”). */
+  sub?: string;
   onPress: () => void;
   accessibilityLabel: string;
 }
 
-export function ValueTile({ label, value, unit, muted, onPress, accessibilityLabel }: Props) {
+export function ValueTile({ label, value, unit, muted, sub, onPress, accessibilityLabel }: Props) {
   const theme = useTheme();
   return (
     <Pressable
@@ -39,7 +41,9 @@ export function ValueTile({ label, value, unit, muted, onPress, accessibilityLab
           </Text>
         ) : null}
       </View>
-      <Label style={{ fontSize: 11 }}>{t.calc.tapToEdit}</Label>
+      <Label style={{ fontSize: 11 }} numberOfLines={1}>
+        {sub ?? t.calc.tapToEdit}
+      </Label>
     </Pressable>
   );
 }

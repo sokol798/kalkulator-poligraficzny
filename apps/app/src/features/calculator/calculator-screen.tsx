@@ -13,8 +13,8 @@ import { useCalculation } from '@/hooks/use-calculation';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
 import { fmtDec, fmtInt } from '@/lib/format';
-import { BLEED_OPTIONS, MARGIN_TOP_OPTIONS, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, QUICK_SHEET_IDS, WASTE_OPTIONS } from '@/lib/library-data';
-import { findFormat, findSheet, useAppStore } from '@/store/app-store';
+import { BLEED_OPTIONS, MARGIN_TOP_OPTIONS, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, WASTE_OPTIONS } from '@/lib/library-data';
+import { findFormat, useAppStore } from '@/store/app-store';
 import { spacing } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
 
@@ -24,8 +24,7 @@ export function CalculatorScreen() {
   const inputs = useAppStore((s) => s.inputs);
   const settings = useAppStore((s) => s.settings);
   const myFormats = useAppStore((s) => s.formats);
-  const mySheets = useAppStore((s) => s.sheets);
-  const { setInput, setSize, applyFormat, applySheet, saveCurrent, toggleStar } = useAppStore();
+  const { setInput, setSize, applyFormat, saveCurrent, toggleStar } = useAppStore();
   const currentEntryId = useAppStore((s) => s.currentEntryId);
   const starred = useAppStore((s) => (s.currentEntryId ? s.history.find((h) => h.id === s.currentEntryId)?.starred : false)) ?? false;
   const calc = useCalculation();
@@ -51,9 +50,6 @@ export function CalculatorScreen() {
   const selectedFormat = findFormat(inputs.formatId, myFormats);
   const showExtraFormat = selectedFormat && !QUICK_FORMAT_IDS.includes(selectedFormat.id);
 
-  const quickSheets = QUICK_SHEET_IDS.map((id) => findSheet(id, mySheets)!).filter(Boolean);
-  const selectedSheet = inputs.customSheet ? null : findSheet(inputs.sheetId, mySheets);
-  const showExtraSheet = inputs.customSheet || (selectedSheet && !QUICK_SHEET_IDS.includes(selectedSheet.id));
 
   const customGrammage = !QUICK_GRAMMAGES.includes(inputs.grammage);
   const customBleed = !BLEED_OPTIONS.includes(inputs.bleed);
@@ -116,32 +112,29 @@ export function CalculatorScreen() {
         </View>
       </Card>
 
-      {/* Nakład | Cena za arkusz – kafelki, dotknięcie otwiera edycję */}
+      {/* Nakład | Arkusz – kafelki, dotknięcie otwiera edycję / listę */}
       <View style={styles.twoCol}>
         <ValueTile label={t.calc.quantity} value={fmtInt(inputs.quantity)} unit={t.common.pcs} onPress={() => router.push('/edit-quantity')} accessibilityLabel={t.calc.editQuantity} />
-        {settings.priceEnabled ? (
-          <ValueTile
-            label={t.calc.priceCard}
-            value={inputs.pricePerSheet > 0 ? fmtDec(inputs.pricePerSheet, 2) : '—'}
-            unit={inputs.pricePerSheet > 0 ? t.settings.pln : undefined}
-            muted={!(inputs.pricePerSheet > 0)}
-            onPress={() => router.push('/edit-price')}
-            accessibilityLabel={t.calc.editPrice}
-          />
-        ) : null}
+        <ValueTile label={t.calc.sheet} value={calc.sheet.name} sub={unit.fmtSize(calc.sheet.size.width, calc.sheet.size.height)} onPress={() => router.push('/pick-sheet')} accessibilityLabel={t.pickSheet.title} />
       </View>
 
-      {/* Arkusz */}
-      <Card>
-        <Label>{t.calc.sheet}</Label>
-        <View style={styles.chips}>
-          {quickSheets.map((s) => (
-            <Chip key={s.id} label={s.name} on={!inputs.customSheet && inputs.sheetId === s.id} onPress={() => applySheet(s.id)} />
-          ))}
-          {showExtraSheet ? <Chip label={calc.sheet.name} on onPress={() => router.push('/pick-sheet')} /> : null}
-          <Chip label={t.calc.more} dashed onPress={() => router.push('/pick-sheet')} icon={<ChevronDown color={theme.ink} />} style={{ marginLeft: 'auto' }} />
-        </View>
-      </Card>
+      {/* Cena za arkusz (opcjonalna) */}
+      {settings.priceEnabled ? (
+        <Pressable onPress={() => router.push('/edit-price')} accessibilityRole="button" accessibilityLabel={t.calc.editPrice} style={({ pressed }) => pressed && { opacity: 0.75 }}>
+          <Card style={styles.between}>
+            <View>
+              <Label>{t.calc.priceCard}</Label>
+              <Label style={{ fontSize: 11 }}>{inputs.pricePerSheet > 0 ? t.calc.tapToEdit : t.calc.priceHint}</Label>
+            </View>
+            <View style={styles.priceRow}>
+              <Text variant="value" color={inputs.pricePerSheet > 0 ? 'ink' : 'muted'}>
+                {inputs.pricePerSheet > 0 ? `${fmtDec(inputs.pricePerSheet, 2)} ${t.settings.pln}` : '—'}
+              </Text>
+              <ChevronRight color={theme.muted} size={12} />
+            </View>
+          </Card>
+        </Pressable>
+      ) : null}
 
       {/* Papier */}
       <Card>
@@ -254,6 +247,7 @@ const styles = StyleSheet.create({
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md },
   twoCol: { flexDirection: 'row', gap: spacing.md },
   col: { flex: 1, minWidth: 0 },
+  priceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   resultRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
   actions: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
 });
