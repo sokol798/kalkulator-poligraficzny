@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { cleanupLegacyServiceWorker } from '@/lib/cleanup-legacy-sw';
 import { palette } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
@@ -20,6 +21,10 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError || Platform.OS === 'web') SplashScreen.hideAsync();
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    void cleanupLegacyServiceWorker();
+  }, []);
 
   if (!fontsLoaded && !fontError && Platform.OS !== 'web') return null;
 

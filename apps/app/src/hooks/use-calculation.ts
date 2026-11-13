@@ -39,12 +39,13 @@ export interface Calculation {
 }
 
 export function resolveSheet(inputs: CalcInputs, mySheets: LibrarySheet[]): ResolvedSheet {
+  const top = (fromSheet: number) => (inputs.marginTop == null ? fromSheet : inputs.marginTop);
   if (inputs.customSheet) {
     const c = inputs.customSheet;
-    return { name: `${trim(c.width)} × ${trim(c.height)}`, size: { width: c.width, height: c.height }, marginTop: c.marginTop, marginSides: c.marginSides, isCustom: true };
+    return { name: `${trim(c.width)} × ${trim(c.height)}`, size: { width: c.width, height: c.height }, marginTop: top(c.marginTop), marginSides: c.marginSides, isCustom: true };
   }
   const s = findSheet(inputs.sheetId, mySheets) ?? findSheet('sh-b1', [])!;
-  return { name: s.name, size: { width: s.width, height: s.height }, marginTop: s.marginTop, marginSides: s.marginSides, isCustom: false };
+  return { name: s.name, size: { width: s.width, height: s.height }, marginTop: top(s.marginTop), marginSides: s.marginSides, isCustom: false };
 }
 
 export function buildImpositionInput(inputs: CalcInputs, sheet: ResolvedSheet): ImpositionInput {

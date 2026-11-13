@@ -41,7 +41,7 @@ export const DEFAULT_SETTINGS: Settings = {
   wasteEnabled: false,
   wastePercent: 5,
   wasteMinSheets: 0,
-  priceEnabled: false,
+  priceEnabled: true,
   pricePerSheet: 0,
   autoSave: true,
   unit: 'mm',
@@ -65,6 +65,8 @@ export interface CalcInputs {
   /** Arkusz wpisany ręcznie w arkuszu wyboru (ma pierwszeństwo przed sheetId). */
   customSheet: CustomSheet | null;
   grammage: number;
+  /** Margines górny (chwyt) dla tego obliczenia; null = z arkusza. */
+  marginTop: number | null;
   /** Naddatek w % dla tego obliczenia (używany, gdy włączony w ustawieniach). */
   wastePercent: number;
   /** Cena za arkusz dla tego obliczenia (używana, gdy włączona w ustawieniach). */
@@ -123,6 +125,7 @@ function inputsFromSettings(s: Settings): CalcInputs {
     sheetId: s.defaultSheetId,
     customSheet: null,
     grammage: s.grammage,
+    marginTop: null,
     wastePercent: s.wastePercent,
     pricePerSheet: s.pricePerSheet,
   };
@@ -146,8 +149,8 @@ export const useAppStore = create<AppState>()(
         set((s) => ({
           inputs: { ...s.inputs, width: f.width, height: f.height, formatId: f.id, bleed: f.bleed ?? s.settings.bleed },
         })),
-      applySheet: (sheetId) => set((s) => ({ inputs: { ...s.inputs, sheetId, customSheet: null } })),
-      applyCustomSheet: (customSheet) => set((s) => ({ inputs: { ...s.inputs, customSheet } })),
+      applySheet: (sheetId) => set((s) => ({ inputs: { ...s.inputs, sheetId, customSheet: null, marginTop: null } })),
+      applyCustomSheet: (customSheet) => set((s) => ({ inputs: { ...s.inputs, customSheet, marginTop: null } })),
       newCalculation: () => set((s) => ({ inputs: inputsFromSettings(s.settings), currentEntryId: null })),
       loadInputs: (inputs) => set({ inputs: { ...inputs }, currentEntryId: null }),
 
@@ -188,7 +191,12 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'printcalc-v3',
-      version: 3,
+      version: 4,
+      migrate: (persisted, version) => {
+        const st = persisted as Partial<AppState>;
+        if (version < 4 && st.inputs) st.inputs = { ...st.inputs, marginTop: st.inputs.marginTop ?? null };
+        return st as AppState;
+      },
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({ inputs: s.inputs, currentEntryId: s.currentEntryId, settings: s.settings, formats: s.formats, sheets: s.sheets, history: s.history }),
     },
