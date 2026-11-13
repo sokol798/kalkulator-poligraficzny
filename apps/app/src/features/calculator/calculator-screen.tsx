@@ -4,8 +4,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { BookmarkIcon, ChevronDown, ChevronRight, GearIcon } from '@/components/icons';
 import { NumberField } from '@/components/number-field';
-import { QuantityDrum, stepQuantity } from '@/components/quantity-drum';
 import { SheetPreview } from '@/components/sheet-preview';
+import { ValueTile } from '@/components/value-tile';
 import { Card, Chip, IconButton, Label, PillButton, Screen, TabHeader, Text } from '@/components/ui';
 import { FunctionsMenu, MenuTitle } from '@/features/calculator/functions-menu';
 import { summaryOf } from '@/features/calculator/use-auto-save';
@@ -13,7 +13,7 @@ import { useCalculation } from '@/hooks/use-calculation';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
 import { fmtDec, fmtInt } from '@/lib/format';
-import { BLEED_OPTIONS, MARGIN_TOP_OPTIONS, QUANTITY_MAX, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, QUICK_SHEET_IDS, WASTE_OPTIONS } from '@/lib/library-data';
+import { BLEED_OPTIONS, MARGIN_TOP_OPTIONS, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, QUICK_SHEET_IDS, WASTE_OPTIONS } from '@/lib/library-data';
 import { findFormat, findSheet, useAppStore } from '@/store/app-store';
 import { spacing } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -65,7 +65,6 @@ export function CalculatorScreen() {
     const id = saveCurrent(summaryOf(calc), currentEntryId ? undefined : { star: true });
     if (currentEntryId) toggleStar(id);
   };
-  const step = (dir: 1 | -1) => setInput('quantity', Math.min(QUANTITY_MAX, stepQuantity(inputs.quantity, dir)));
 
   /** Pole „inne” w rzędzie chipów. */
   const otherField = (opts: { value: number; isCustom: boolean; onChange: (v: number) => void; decimals: number; max?: number; label: string; width?: number }) => (
@@ -117,19 +116,20 @@ export function CalculatorScreen() {
         </View>
       </Card>
 
-      {/* Nakład – bęben */}
-      <Card>
-        <View style={styles.between}>
-          <Label>{t.calc.quantity}</Label>
-          <Label style={{ fontSize: 11 }}>{t.calc.quantityMax}</Label>
-        </View>
-        <View style={styles.stepper}>
-          <StepButton label="−" onPress={() => step(-1)} accessibilityLabel={t.calc.less} />
-          <NumberField value={inputs.quantity} onChange={(v) => setInput('quantity', Math.min(QUANTITY_MAX, v))} decimals={0} max={QUANTITY_MAX} size="lg" format={fmtInt} accessibilityLabel={t.calc.quantity} />
-          <StepButton label="+" onPress={() => step(1)} accessibilityLabel={t.calc.moreQty} />
-        </View>
-        <QuantityDrum value={inputs.quantity} onChange={(q) => setInput('quantity', q)} />
-      </Card>
+      {/* Nakład | Cena za arkusz – kafelki, dotknięcie otwiera edycję */}
+      <View style={styles.twoCol}>
+        <ValueTile label={t.calc.quantity} value={fmtInt(inputs.quantity)} unit={t.common.pcs} onPress={() => router.push('/edit-quantity')} accessibilityLabel={t.calc.editQuantity} />
+        {settings.priceEnabled ? (
+          <ValueTile
+            label={t.calc.priceCard}
+            value={inputs.pricePerSheet > 0 ? fmtDec(inputs.pricePerSheet, 2) : '—'}
+            unit={inputs.pricePerSheet > 0 ? t.settings.pln : undefined}
+            muted={!(inputs.pricePerSheet > 0)}
+            onPress={() => router.push('/edit-price')}
+            accessibilityLabel={t.calc.editPrice}
+          />
+        ) : null}
+      </View>
 
       {/* Arkusz */}
       <Card>
@@ -191,20 +191,6 @@ export function CalculatorScreen() {
         </Card>
       ) : null}
 
-      {/* Złotówki – cena za arkusz (opcjonalna) */}
-      {settings.priceEnabled ? (
-        <Card style={styles.between}>
-          <View>
-            <Label>{t.calc.priceCard}</Label>
-            <Label style={{ fontSize: 11 }}>{t.calc.priceHint}</Label>
-          </View>
-          <View style={styles.priceRow}>
-            <NumberField value={inputs.pricePerSheet} onChange={(v) => setInput('pricePerSheet', v)} decimals={2} size="md" placeholder={t.calc.pricePlaceholder} accessibilityLabel={t.calc.price} format={(n) => (n > 0 ? n.toFixed(2).replace('.', ',') : '')} width={104} />
-            <Label>{t.settings.pln}</Label>
-          </View>
-        </Card>
-      ) : null}
-
       {/* Wynik – po kliknięciu „Oblicz” */}
       {computed ? (
         <Card>
@@ -256,15 +242,6 @@ export function CalculatorScreen() {
   );
 }
 
-function StepButton({ label, onPress, accessibilityLabel }: { label: string; onPress: () => void; accessibilityLabel: string }) {
-  const theme = useTheme();
-  return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel} style={({ pressed }) => [styles.step, { backgroundColor: theme.field, opacity: pressed ? 0.7 : 1 }]}>
-      <Text variant="input">{label}</Text>
-    </Pressable>
-  );
-}
-
 /** Opis układu najlepszego wariantu (do karty zlecenia). */
 export function layoutLabel(strategy: 'grid-portrait' | 'grid-landscape' | 'mixed'): string {
   return strategy === 'mixed' ? t.calc.layoutMixed : strategy === 'grid-portrait' ? t.calc.layoutPortrait : t.calc.layoutLandscape;
@@ -275,11 +252,8 @@ const styles = StyleSheet.create({
   sizeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
   times: { width: 20, textAlign: 'center', marginTop: 13 },
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md },
-  stepper: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  step: { width: 52, height: 52, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   twoCol: { flexDirection: 'row', gap: spacing.md },
   col: { flex: 1, minWidth: 0 },
-  priceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   resultRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
   actions: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
 });
