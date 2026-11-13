@@ -10,6 +10,7 @@ import { BUILTIN_FORMATS, BUILTIN_SHEETS, newId, type LibraryFormat, type Librar
 
 export type Rounding = 'up' | 'ten';
 export type Unit = 'mm' | 'cm';
+export type ThemeChoice = 'system' | 'light' | 'dark';
 
 export interface Settings {
   /** Spad domyślny, mm. */
@@ -29,6 +30,8 @@ export interface Settings {
   pricePerSheet: number;
   autoSave: boolean;
   unit: Unit;
+  /** Motyw: biały, czarny lub wg systemu. */
+  theme: ThemeChoice;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -45,6 +48,7 @@ export const DEFAULT_SETTINGS: Settings = {
   pricePerSheet: 0,
   autoSave: true,
   unit: 'mm',
+  theme: 'system',
 };
 
 export interface CustomSheet {
@@ -191,10 +195,11 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'printcalc-v3',
-      version: 4,
+      version: 5,
       migrate: (persisted, version) => {
         const st = persisted as Partial<AppState>;
         if (version < 4 && st.inputs) st.inputs = { ...st.inputs, marginTop: st.inputs.marginTop ?? null };
+        if (version < 5 && st.settings) st.settings = { ...DEFAULT_SETTINGS, ...st.settings, theme: st.settings.theme ?? 'system' };
         return st as AppState;
       },
       storage: createJSONStorage(() => AsyncStorage),

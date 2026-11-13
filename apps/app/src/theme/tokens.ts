@@ -21,9 +21,9 @@ export const palette = {
     previewLine: '#5c6670',
   },
   dark: {
-    bg: '#141517',
-    surface: '#1f2124',
-    field: '#2a2d31',
+    bg: '#0b0c0e',
+    surface: '#1a1c1f',
+    field: '#26292d',
     border: '#2e3137',
     ink: '#f2f2f0',
     muted: '#a0a4ab',

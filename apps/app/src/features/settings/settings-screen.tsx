@@ -94,6 +94,9 @@ export function SettingsScreen() {
 
       <SectionLabel>{t.settings.display}</SectionLabel>
       <Card style={{ paddingVertical: 2, gap: 0 }}>
+        <Row title={t.settings.theme} onPress={open('theme')}>
+          <Value>{s.theme === 'light' ? t.settings.themeLight : s.theme === 'dark' ? t.settings.themeDark : t.settings.themeSystem}</Value>
+        </Row>
         <Row title={t.settings.unit} onPress={open('unit')} last>
           <Value>{s.unit}</Value>
         </Row>

@@ -7,14 +7,14 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { cleanupLegacyServiceWorker } from '@/lib/cleanup-legacy-sw';
 import { palette } from '@/theme/tokens';
+import { useAppColorScheme } from '@/theme/use-theme';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const scheme = useColorScheme();
+  const scheme = useAppColorScheme();
   const colors = palette[scheme === 'dark' ? 'dark' : 'light'];
   const [fontsLoaded, fontError] = useFonts({ Inter_400Regular, Inter_500Medium, Inter_600SemiBold });
 

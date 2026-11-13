@@ -2,7 +2,7 @@
 import { BLEED_OPTIONS, MARGIN_SIDES_OPTIONS, MARGIN_TOP_OPTIONS, QUICK_GRAMMAGES, WASTE_OPTIONS } from '@/lib/library-data';
 import type { Settings } from '@/store/app-store';
 
-export type SettingsItemKey = 'bleed' | 'margins' | 'rounding' | 'grammage' | 'waste' | 'price' | 'unit';
+export type SettingsItemKey = 'bleed' | 'margins' | 'rounding' | 'grammage' | 'waste' | 'price' | 'unit' | 'theme';
 
 export interface ChoiceField {
   kind: 'choice';
@@ -96,6 +96,23 @@ export const SETTINGS_ITEMS: SettingsItemDef[] = [
     fields: [
       { kind: 'toggle', key: 'priceEnabled', title: 'Licz koszt papieru', hint: 'pole „Cena za arkusz” w kalkulatorze' },
       { kind: 'number', key: 'pricePerSheet', title: 'Domyślna cena za arkusz', decimals: 2, unit: 'zł', showIf: 'priceEnabled' },
+    ],
+  },
+  {
+    key: 'theme',
+    title: 'Motyw',
+    hint: 'wygląd aplikacji',
+    fields: [
+      {
+        kind: 'choice',
+        key: 'theme',
+        title: 'Kolory',
+        options: [
+          { value: 'light', label: 'Biały' },
+          { value: 'dark', label: 'Czarny' },
+          { value: 'system', label: 'Automatyczny (jak w systemie)' },
+        ],
+      },
     ],
   },
   {
