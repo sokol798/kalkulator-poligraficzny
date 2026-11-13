@@ -1,0 +1,41 @@
+<!-- @dsCard group="Propozycje" height=420 width=560 subtitle="Propozycja 3 — plakatowa, Space Grotesk, bloki C/M/Y/K" -->
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+  html,body{margin:0;background:var(--p3-bg);color:var(--p3-key);font-family:var(--font-grotesk)}
+  .page{padding:var(--space-5);box-sizing:border-box;width:560px}
+  .card{border:2px solid var(--p3-key);border-radius:var(--radius-none)}
+  .bar{display:flex;height:8px}
+  .bar i{flex:1}
+  .c{background:var(--p3-cyan)}.m{background:var(--p3-magenta)}.y{background:var(--p3-yellow)}.k{background:var(--p3-key)}
+  .in{padding:var(--space-5)}
+  h1{font:700 11px/16px var(--font-grotesk);letter-spacing:.1em;text-transform:uppercase;margin:0 0 var(--space-4)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
+  .field{background:var(--p3-surface);padding:var(--space-2) var(--space-3);border-left:6px solid}
+  .label{font-size:11px;line-height:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--p3-muted);font-weight:700}
+  .value{font-size:18px;line-height:24px;font-weight:500}
+  .value small{color:var(--p3-muted)}
+  .result{display:flex;justify-content:space-between;align-items:flex-end;margin-top:var(--space-5)}
+  .big{font-size:56px;line-height:56px;font-weight:700;letter-spacing:-.02em;color:var(--p3-accent)}
+  .big small{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--p3-key);margin-left:var(--space-2);font-weight:700}
+  .sub{font-size:14px;line-height:20px;color:var(--p3-muted);margin-top:var(--space-1)}
+  .btn{background:var(--p3-key);color:#fff;border:0;padding:var(--space-3) var(--space-5);font:700 13px/20px var(--font-grotesk);letter-spacing:.1em;text-transform:uppercase}
+</style></head><body>
+<div class="page"><div class="card">
+  <div class="bar"><i class="c"></i><i class="m"></i><i class="y"></i><i class="k"></i></div>
+  <div class="in">
+  <h1>Kalkulator poligraficzny</h1>
+  <div class="grid">
+    <div class="field" style="border-color:var(--p3-cyan)"><div class="label">Format netto</div><div class="value">210 × 297 <small>mm</small></div></div>
+    <div class="field" style="border-color:var(--p3-magenta)"><div class="label">Spady</div><div class="value">3 <small>mm</small></div></div>
+    <div class="field" style="border-color:var(--p3-yellow)"><div class="label">Arkusz</div><div class="value">B2 · 500 × 700 <small>mm</small></div></div>
+    <div class="field" style="border-color:var(--p3-key)"><div class="label">Nakład</div><div class="value">1 000 <small>szt.</small></div></div>
+  </div>
+  <div class="result">
+    <div><div class="big">125<small>arkuszy</small></div><div class="sub">8 użytków na arkuszu · odpad 11 %</div></div>
+    <button class="btn">Przelicz</button>
+  </div>
+  </div>
+</div></div>
+</body></html>

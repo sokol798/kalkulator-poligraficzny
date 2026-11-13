@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Aplikacja — Biblioteka: formaty</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+body{margin:0;background:#eceff2;color:#111111;font-family:Inter,system-ui,sans-serif}
+a{color:#111111;text-decoration:none}a:hover{color:#5c6670}
+input,button{font-family:inherit}
+input{box-sizing:border-box;background:#ffffff;border:1px solid #ffffff;border-radius:999px;padding:12px 16px 12px 40px;font-size:15px;color:#111111;outline:none;width:100%;min-height:48px}
+input:focus{border-color:#111111}
+.lbl{font-size:13px;line-height:18px;color:#5c6670;font-weight:500}
+.icobtn{width:44px;height:44px;border-radius:999px;border:0;background:#ffffff;display:flex;align-items:center;justify-content:center}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#ffffff;border-radius:999px;padding:4px;gap:2px}
+.seg a{display:flex;align-items:center;justify-content:center;border-radius:999px;padding:10px;font-size:14px;font-weight:500;color:#5c6670;min-height:40px;box-sizing:border-box}
+.seg a.on{background:#111111;color:#ffffff}
+.item{display:flex;align-items:center;gap:14px;background:#ffffff;border-radius:16px;padding:12px 16px;min-height:64px;box-sizing:border-box;color:#111111}
+.thumb{background:#eceff2;border-radius:3px;flex-shrink:0;border:1px solid #dbe0e5;box-sizing:border-box}
+.sec{font-size:12px;font-weight:600;color:#5c6670;text-transform:uppercase;letter-spacing:.04em;margin:14px 4px 6px}
+.use{font-size:13px;font-weight:600;color:#111111;border:1px solid #dbe0e5;border-radius:999px;padding:8px 12px;min-height:36px;display:flex;align-items:center}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#ffffff;border-radius:20px;padding:6px;gap:2px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;font-size:11px;font-weight:500;color:#5c6670;min-height:52px;box-sizing:border-box;justify-content:center}
+.tab.on{background:#111111;color:#ffffff}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #eceff2; overflow: hidden; padding: 0 16px;">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 56px 0 12px;">
+    <span style="font-size: 20px; font-weight: 600;">Biblioteka</span>
+    <a href="App_NowyFormat.dc.html" class="icobtn" aria-label="Dodaj format" style="background: #111111;"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="#ffffff" stroke-width="1.8"/></svg></a>
+  </header>
+
+  <nav class="seg" aria-label="Rodzaj">
+    <a href="App_Formaty.dc.html" class="on">Formaty</a>
+    <a href="App_Arkusze.dc.html">Arkusze</a>
+  </nav>
+
+  <div style="position: relative; margin-top: 10px;">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 16px; top: 16px;"><circle cx="7" cy="7" r="5" fill="none" stroke="#5c6670" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="#5c6670" stroke-width="1.5"/></svg>
+    <label for="q" style="position: absolute; left: -9999px;">Szukaj</label>
+    <input id="q" type="text" placeholder="Szukaj: A5, 148, wizytówka…">
+  </div>
+
+  <div class="sec">Moje</div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="item"><span class="thumb" style="height: 40px; width: 28px;"></span><span style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Ulotka A5 Targi</span><span class="lbl">148 × 210 · spad 3</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+    <div class="item"><span class="thumb" style="height: 22px; width: 40px;"></span><span style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Wizytówka</span><span class="lbl">90 × 50 · spad 2</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+    <div class="item"><span class="thumb" style="height: 40px; width: 19px;"></span><span style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600;">Ulotka DL</span><span class="lbl">99 × 210 · spad 3</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+  </div>
+
+  <div class="sec">Standardowe</div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="item" style="min-height: 56px; padding: 10px 16px;"><span style="flex: 1; display: flex; gap: 12px; align-items: baseline;"><span style="font-size: 16px; font-weight: 600; min-width: 36px;">A4</span><span class="lbl">210 × 297 mm</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+    <div class="item" style="min-height: 56px; padding: 10px 16px;"><span style="flex: 1; display: flex; gap: 12px; align-items: baseline;"><span style="font-size: 16px; font-weight: 600; min-width: 36px;">A5</span><span class="lbl">148 × 210 mm</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+    <div class="item" style="min-height: 56px; padding: 10px 16px;"><span style="flex: 1; display: flex; gap: 12px; align-items: baseline;"><span style="font-size: 16px; font-weight: 600; min-width: 36px;">A6</span><span class="lbl">105 × 148 mm</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+    <div class="item" style="min-height: 56px; padding: 10px 16px;"><span style="flex: 1; display: flex; gap: 12px; align-items: baseline;"><span style="font-size: 16px; font-weight: 600; min-width: 36px;">DL</span><span class="lbl">99 × 210 mm</span></span><a href="App_Kalkulator.dc.html" class="use">Użyj</a></div>
+  </div>
+
+  <nav class="tabs" style="margin-top: auto; margin-bottom: 20px;" aria-label="Nawigacja">
+    <a href="App_Kalkulator.dc.html" class="tab"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2" width="12" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h6M6 9.5h2M10 9.5h2M6 13h2M10 13h2" stroke="currentColor" stroke-width="1.5"/></svg>Kalkulator</a>
+    <a href="App_Formaty.dc.html" class="tab on"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 9h13M9 2.5v13" stroke="currentColor" stroke-width="1.5"/></svg>Biblioteka</a>
+    <a href="App_Historia.dc.html" class="tab"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Historia</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

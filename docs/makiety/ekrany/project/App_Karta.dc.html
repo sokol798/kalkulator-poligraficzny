@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Aplikacja — Karta zlecenia</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+body{margin:0;background:#eceff2;color:#111111;font-family:Inter,system-ui,sans-serif}
+a{color:#111111;text-decoration:none}a:hover{color:#5c6670}
+input,button{font-family:inherit}
+input{box-sizing:border-box;background:transparent;border:0;border-bottom:1px solid #dbe0e5;padding:6px 0;font-size:17px;font-weight:600;color:#111111;outline:none;width:100%}
+input:focus{border-bottom-color:#111111}
+.lbl{font-size:13px;line-height:18px;color:#5c6670;font-weight:500}
+.card{background:#ffffff;border-radius:16px;padding:16px;box-sizing:border-box}
+.icobtn{width:44px;height:44px;border-radius:999px;border:0;background:#ffffff;display:flex;align-items:center;justify-content:center}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #dbe0e5;font-size:14px}
+.row:last-child{border-bottom:0}
+.uz{background:#ffffff;border:1px solid #dbe0e5;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:#5c6670}
+.act{display:flex;align-items:center;justify-content:center;gap:8px;background:#ffffff;border-radius:999px;padding:12px;font-size:14px;font-weight:500;color:#111111;min-height:48px;box-sizing:border-box;border:1px solid #dbe0e5}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #eceff2; overflow: hidden; padding: 0 16px;">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 56px 0 14px;">
+    <a href="App_Kalkulator.dc.html" class="icobtn" aria-label="Wstecz"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2 4 8l6 6" fill="none" stroke="#111111" stroke-width="1.6"/></svg></a>
+    <span style="font-size: 16px; font-weight: 600;">Karta zlecenia</span>
+    <button type="button" class="icobtn" aria-label="Zapisz w historii"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h10v12l-5-3-5 3z" fill="none" stroke="#111111" stroke-width="1.5"/></svg></button>
+  </header>
+
+  <div class="card" style="display: flex; flex-direction: column; gap: 14px;">
+    <div>
+      <label for="n" class="lbl">Nazwa (opcjonalnie)</label>
+      <input id="n" type="text" value="Ulotka A5 — Targi Poznań">
+    </div>
+    <div style="display: flex; gap: 16px; align-items: flex-start;">
+      <div style="width: 150px; height: 210px; background: #eceff2; border-radius: 6px; box-sizing: border-box; position: relative; padding: 8px 6px 5px; flex-shrink: 0;">
+        <div style="position: absolute; left: 0; right: 0; top: 3px; border-top: 1px dashed #5c6670;"></div>
+        <div style="display: grid; grid-template-columns: repeat(3, 46px); grid-auto-rows: 65px; gap: 0;">
+          <div class="uz">1</div><div class="uz">2</div><div class="uz">3</div>
+          <div class="uz">4</div><div class="uz">5</div><div class="uz">6</div>
+          <div class="uz">7</div><div class="uz">8</div><div class="uz">9</div>
+        </div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+        <div><div class="lbl">Arkuszy B2</div><div style="font-size: 48px; line-height: 1; font-weight: 600; letter-spacing: -0.04em; margin-top: 2px;">112</div></div>
+        <div><div class="lbl">Nakład</div><div style="font-size: 17px; font-weight: 600;">1 000 szt.</div></div>
+        <div><div class="lbl">Na arkuszu</div><div style="font-size: 17px; font-weight: 600;">9 · 3 × 3 · pion</div></div>
+        <div><div class="lbl">Papier</div><div style="font-size: 17px; font-weight: 600;">130 g/m² · 5,1 kg</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 10px; padding: 6px 16px;">
+    <div class="row"><span class="lbl">Format netto</span><span style="font-weight: 500;">148 × 210 mm (A5)</span></div>
+    <div class="row"><span class="lbl">Ze spadami 3 mm</span><span style="font-weight: 500;">154 × 216 mm</span></div>
+    <div class="row"><span class="lbl">Arkusz · chwyt</span><span style="font-weight: 500;">B2 500 × 700 · 10 mm</span></div>
+    <div class="row"><span class="lbl">Wykorzystanie · ostatni arkusz</span><span style="font-weight: 500;">86 % · 1 użytek</span></div>
+    <div class="row"><span class="lbl">Waga arkuszy (112 × 45,5 g)</span><span style="font-weight: 500;">5,1 kg</span></div>
+    <div class="row"><span class="lbl">Waga 1 szt. / nakładu</span><span style="font-weight: 500;">4,0 g / 4,0 kg</span></div>
+    <div class="row"><span class="lbl">Data</span><span style="font-weight: 500;">9 lis 2026, 19:52</span></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px;">
+    <button type="button" class="act"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h7l3 3v9H3z M10 2v3h3" fill="none" stroke="#111111" stroke-width="1.5"/></svg>Pobierz PDF</button>
+    <button type="button" class="act"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M4.5 5.5 8 2l3.5 3.5M3 9v4h10V9" fill="none" stroke="#111111" stroke-width="1.5"/></svg>Udostępnij</button>
+  </div>
+
+  <div style="margin-top: auto; padding-bottom: 24px;">
+    <a href="App_Kalkulator.dc.html" style="display: flex; align-items: center; justify-content: center; background: #111111; color: #ffffff; border-radius: 999px; padding: 14px; font-size: 15px; font-weight: 600; min-height: 50px; box-sizing: border-box;">Nowe obliczenie</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

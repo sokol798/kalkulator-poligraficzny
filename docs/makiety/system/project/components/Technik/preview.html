@@ -1,0 +1,36 @@
+<!-- @dsCard group="Propozycje" height=420 width=560 subtitle="Propozycja 2 — inżynierska, JetBrains Mono + Inter, siatka kropek" -->
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Inter:wght@400;600&display=swap">
+<style>
+  html,body{margin:0;background:var(--p2-bg);color:var(--p2-ink);font-family:var(--font-sans)}
+  body{background-image:radial-gradient(var(--p2-grid) 1px, transparent 1px);background-size:16px 16px}
+  .page{padding:var(--space-5);box-sizing:border-box;width:560px}
+  .card{background:var(--p2-surface);border:1px solid var(--p2-ink);border-radius:var(--radius-none);padding:var(--space-5);position:relative}
+  .card:before{content:"ARK-01 · B2";position:absolute;top:-1px;right:-1px;background:var(--p2-ink);color:var(--p2-surface);font:600 11px/16px var(--font-mono);padding:2px var(--space-2)}
+  h1{font:600 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--p2-muted);margin:0 0 var(--space-4)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
+  .field{border:1px solid var(--p2-grid);padding:var(--space-2) var(--space-3)}
+  .label{font-size:12px;line-height:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--p2-muted);font-weight:600}
+  .value{font:500 16px/24px var(--font-mono);font-variant-numeric:tabular-nums}
+  .value small{color:var(--p2-muted)}
+  .result{margin-top:var(--space-4);border-top:1px solid var(--p2-ink);padding-top:var(--space-4);display:flex;justify-content:space-between;align-items:flex-end}
+  .big{font:600 44px/48px var(--font-mono);color:var(--p2-accent);font-variant-numeric:tabular-nums}
+  .big small{font-size:14px;color:var(--p2-muted);margin-left:var(--space-2);font-weight:500}
+  .sub{font:400 14px/20px var(--font-sans);color:var(--p2-muted);margin-top:var(--space-1)}
+  .btn{background:var(--p2-accent);color:#fff;border:0;border-radius:var(--radius-none);padding:var(--space-3) var(--space-4);font:600 13px/20px var(--font-sans);letter-spacing:.04em;text-transform:uppercase}
+</style></head><body>
+<div class="page"><div class="card">
+  <h1>Kalkulator poligraficzny</h1>
+  <div class="grid">
+    <div class="field"><div class="label">Format netto</div><div class="value">210 × 297 <small>mm</small></div></div>
+    <div class="field"><div class="label">Spady</div><div class="value">3 <small>mm</small></div></div>
+    <div class="field"><div class="label">Arkusz</div><div class="value">500 × 700 <small>mm</small></div></div>
+    <div class="field"><div class="label">Nakład</div><div class="value">1000 <small>szt</small></div></div>
+  </div>
+  <div class="result">
+    <div><div class="big">125<small>ARK.</small></div><div class="sub">8 użytków/ark. · odpad 11 % · 2 × 4</div></div>
+    <button class="btn">Przelicz</button>
+  </div>
+</div></div>
+</body></html>

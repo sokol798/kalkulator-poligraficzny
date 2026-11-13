@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Aplikacja — Ustawienia</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+body{margin:0;background:#eceff2;color:#111111;font-family:Inter,system-ui,sans-serif}
+a{color:#111111;text-decoration:none}a:hover{color:#5c6670}
+button{font-family:inherit}
+.lbl{font-size:13px;line-height:18px;color:#5c6670;font-weight:500}
+.card{background:#ffffff;border-radius:16px;padding:4px 16px;box-sizing:border-box}
+.icobtn{width:44px;height:44px;border-radius:999px;border:0;background:#ffffff;display:flex;align-items:center;justify-content:center}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #dbe0e5;min-height:56px;box-sizing:border-box}
+.row:last-child{border-bottom:0}
+.sec{font-size:12px;font-weight:600;color:#5c6670;text-transform:uppercase;letter-spacing:.04em;margin:14px 4px 6px}
+.seg{display:inline-grid;grid-auto-flow:column;background:#eceff2;border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:500;color:#5c6670;min-height:34px;min-width:40px}
+.seg button.on{background:#111111;color:#ffffff}
+.sw{width:44px;height:26px;border-radius:999px;background:#111111;position:relative;border:0;flex-shrink:0}
+.sw i{position:absolute;top:3px;left:21px;width:20px;height:20px;border-radius:999px;background:#ffffff}
+.sw.off{background:#dbe0e5}.sw.off i{left:3px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #eceff2; overflow: hidden; padding: 0 16px;">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 56px 0 4px;">
+    <a href="App_Kalkulator.dc.html" class="icobtn" aria-label="Wstecz"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2 4 8l6 6" fill="none" stroke="#111111" stroke-width="1.6"/></svg></a>
+    <span style="font-size: 16px; font-weight: 600;">Ustawienia</span>
+    <span style="width: 44px;"></span>
+  </header>
+
+  <div class="sec">Wartości domyślne</div>
+  <div class="card">
+    <div class="row"><span><span style="display: block; font-size: 15px; font-weight: 500;">Spady</span><span class="lbl" style="font-size: 12px;">mm, dodawane z każdej strony</span></span><span class="seg" role="group" aria-label="Spady"><button type="button">0</button><button type="button">2</button><button type="button" class="on">3</button><button type="button">5</button></span></div>
+    <div class="row"><span><span style="display: block; font-size: 15px; font-weight: 500;">Chwyt maszyny</span><span class="lbl" style="font-size: 12px;">mm, pas nieużywany u góry arkusza</span></span><span class="seg" role="group" aria-label="Chwyt"><button type="button">0</button><button type="button">8</button><button type="button" class="on">10</button><button type="button">12</button></span></div>
+    <div class="row"><span><span style="display: block; font-size: 15px; font-weight: 500;">Gramatura papieru</span><span class="lbl" style="font-size: 12px;">g/m², do liczenia wagi</span></span><span class="seg" role="group" aria-label="Gramatura"><button type="button">80</button><button type="button" class="on">130</button><button type="button">170</button><button type="button">300</button></span></div>
+    <div class="row"><span style="font-size: 15px; font-weight: 500;">Arkusz domyślny</span><a href="App_Arkusze.dc.html" style="font-size: 15px; font-weight: 500; color: #5c6670;">B2 · 500 × 700 ›</a></div>
+    <div class="row"><span><span style="display: block; font-size: 15px; font-weight: 500;">Orientacja użytku</span><span class="lbl" style="font-size: 12px;">Auto wybiera więcej użytków</span></span><span class="seg" role="group" aria-label="Orientacja"><button type="button" class="on">Auto</button><button type="button">Pion</button><button type="button">Poziom</button></span></div>
+  </div>
+
+  <div class="sec">Wynik</div>
+  <div class="card">
+    <div class="row"><span><span style="display: block; font-size: 15px; font-weight: 500;">Zaokrąglaj arkusze</span><span class="lbl" style="font-size: 12px;">112 albo 120 (do pełnych 10)</span></span><span class="seg" role="group" aria-label="Zaokrąglanie"><button type="button" class="on">w górę</button><button type="button">do 10</button></span></div>
+    <div class="row"><span><span style="display: block; font-size: 15px; font-weight: 500;">Zapisuj w historii</span><span class="lbl" style="font-size: 12px;">Każde obliczenie, automatycznie</span></span><button type="button" class="sw" role="switch" aria-checked="true" aria-label="Zapisuj w historii"><i></i></button></div>
+    <div class="row"><span style="font-size: 15px; font-weight: 500;">Jednostka</span><span class="seg" role="group" aria-label="Jednostka"><button type="button" class="on">mm</button><button type="button">cm</button></span></div>
+  </div>
+
+  <div class="sec">Pomoc</div>
+  <div class="card">
+    <div class="row"><span style="font-size: 15px; font-weight: 500;">Jak liczymy użytki na arkuszu</span><span style="color: #5c6670;">›</span></div>
+    <div class="row"><span style="font-size: 15px; font-weight: 500;">Eksport historii (CSV)</span><span style="color: #5c6670;">›</span></div>
+  </div>
+
+  <div style="margin-top: auto; padding-bottom: 24px;">
+    <a href="App_Kalkulator.dc.html" style="display: flex; align-items: center; justify-content: center; background: #111111; color: #ffffff; border-radius: 999px; padding: 14px; font-size: 15px; font-weight: 600; min-height: 50px; box-sizing: border-box;">Gotowe</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

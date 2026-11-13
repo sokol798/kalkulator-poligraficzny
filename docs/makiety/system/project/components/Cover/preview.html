@@ -1,0 +1,38 @@
+<!-- @dsCard height=320 -->
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+<style>
+  html,body{margin:0;background:var(--p1-bg);width:960px;height:320px;overflow:hidden;font-family:var(--font-sans)}
+  .wrap{position:relative;width:960px;height:320px}
+  svg{position:absolute;left:0;top:0}
+  .b1{fill:var(--p1-accent)}.b2{fill:var(--p2-accent)}.b3{fill:var(--p3-magenta)}.b4{fill:var(--p4-bg)}.b5{fill:var(--p5-accent)}.b6{fill:var(--p3-yellow)}
+  .plus{stroke:var(--p1-bg);stroke-width:1.5}
+  .name{position:absolute;left:32px;top:148px;width:440px;font-weight:700;font-size:64px;line-height:.95;letter-spacing:-.02em;color:var(--p1-ink);margin:0}
+  .tag{position:absolute;left:32px;top:280px;width:440px;font-size:14px;line-height:20px;color:var(--p1-muted);margin:0}
+</style></head><body>
+<div class="wrap">
+<!-- Derivation:
+ blocks: top band 112px = space-6 × 3.5; five unequal slabs: p1-accent 288, p2-accent 160, p3-magenta 96, p4-bg 256, p5-accent 128, p3-yellow 32 — one per proposal, sized by how loud each is
+ arrangement: top-band skeleton (the name "Kalkulator poligraficzny" is wider than 440px at 64px); strips like a colour-control bar on a press sheet
+ pattern: plus grid at one spacing step (space-4 = 16px pitch, 12 units) — "precise, technical, 4px grid" is what every proposal shares; registration marks are the print-shop motif
+ scales: radius-none on the slabs (square, pressed to the edge), gaps 0, pattern pitch space-4, text insets space-6
+-->
+<svg width="960" height="320" viewBox="0 0 960 320" aria-hidden="true">
+  <rect class="b1" x="0" y="0" width="288" height="112"/>
+  <rect class="b2" x="288" y="0" width="160" height="112"/>
+  <rect class="b3" x="448" y="0" width="96" height="112"/>
+  <rect class="b4" x="544" y="0" width="256" height="112"/>
+  <rect class="b5" x="800" y="0" width="128" height="112"/>
+  <rect class="b6" x="928" y="0" width="32" height="112"/>
+  <g class="plus" fill="none">
+    <path d="M560 56h16M568 48v16"/><path d="M592 56h16M600 48v16"/><path d="M624 56h16M632 48v16"/>
+    <path d="M656 56h16M664 48v16"/><path d="M688 56h16M696 48v16"/><path d="M720 56h16M728 48v16"/>
+    <path d="M752 56h16M760 48v16"/><path d="M784 56h16M792 48v16"/>
+    <path d="M560 88h16M568 80v16"/><path d="M624 88h16M632 80v16"/><path d="M688 88h16M696 80v16"/><path d="M752 88h16M760 80v16"/>
+  </g>
+</svg>
+<h1 class="name">Kalkulator<br>poligraficzny</h1>
+<p class="tag">Pięć propozycji stylu — wybierz jedną, a system zostanie pod nią uporządkowany.</p>
+</div>
+</body></html>
