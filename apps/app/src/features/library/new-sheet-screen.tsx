@@ -88,7 +88,7 @@ export function NewSheetScreen() {
           <NumberField value={MARGIN_SIDES_OPTIONS.includes(marginSides) ? 0 : unit.toDisplay(marginSides)} onChange={(v) => setMarginSides(unit.fromDisplay(v))} decimals={unit.digits} size="sm" pill placeholder={t.newFormat.otherBleed} accessibilityLabel={`${t.newSheet.marginSides} ${t.newFormat.otherBleed}`} format={(n) => (n ? String(n).replace('.', ',') : '')} width={80} />
         </View>
         <Row title={t.newSheet.group}>
-          <Segmented<SheetGroup> value={group} onChange={setGroup} options={[{ value: 'offset', label: t.newSheet.offset }, { value: 'digital', label: t.newSheet.digital }]} style={{ width: 170 }} />
+          <Segmented<SheetGroup> value={group} onChange={setGroup} options={[{ value: 'offset', label: t.newSheet.offset }, { value: 'digital', label: t.newSheet.digital }, { value: 'large', label: t.newSheet.large }]} style={{ width: 230 }} />
         </Row>
         <Row title={t.newSheet.setDefault} last>
           <Toggle value={makeDefault} onChange={setMakeDefault} accessibilityLabel={t.newSheet.setDefault} />

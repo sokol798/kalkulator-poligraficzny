@@ -63,6 +63,7 @@ export const t = {
     hint: (format: string, qty: string) => `Przy każdym arkuszu: ile użytków ${format} się zmieści i ile arkuszy potrzeba na ${qty} szt. Układ zawsze najoszczędniejszy.`,
     offset: 'Offset',
     digital: 'Cyfra',
+    large: 'Wielki format',
     custom: 'Własny arkusz',
     useCustom: 'Użyj własnego arkusza',
     selected: 'Wybrany',
@@ -142,6 +143,7 @@ export const t = {
     group: 'Grupa',
     offset: 'Offset',
     digital: 'Cyfra',
+    large: 'Wielki format',
     setDefault: 'Ustaw jako domyślny',
   },
   history: {

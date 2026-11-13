@@ -59,7 +59,7 @@ export function PickSheetScreen() {
                   {r.sheet.name}
                 </Text>
                 <Label style={{ flex: 1 }} >
-                  {`${unit.fmtSize(r.sheet.width, r.sheet.height, false)} · ${t.pickSheet.margins} ${unit.fmt(r.sheet.marginTop)} / ${unit.fmt(r.sheet.marginSides)}`}
+                  {`${r.sheet.name.includes('×') ? '' : `${unit.fmtSize(r.sheet.width, r.sheet.height, false)} · `}${t.pickSheet.margins} ${unit.fmt(r.sheet.marginTop)} / ${unit.fmt(r.sheet.marginSides)}`}
                 </Label>
                 <Text variant="label" color={r.ups ? 'ink' : 'muted'}>
                   {r.ups ? `${r.ups} · ${fmtInt(r.sheets)} ${t.pickSheet.ark}` : '—'}
@@ -94,6 +94,7 @@ export function PickSheetScreen() {
       <Label>{t.pickSheet.hint(calc.formatName, fmtInt(inputs.quantity))}</Label>
       {renderGroup(t.pickSheet.offset, group('offset'))}
       {renderGroup(t.pickSheet.digital, group('digital'))}
+      {renderGroup(t.pickSheet.large, group('large'))}
       <View>
         <SectionLabel style={{ marginBottom: spacing.sm }}>{t.pickSheet.custom}</SectionLabel>
         <View style={styles.customRow}>

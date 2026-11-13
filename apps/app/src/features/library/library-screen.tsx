@@ -108,6 +108,7 @@ function SheetsList() {
     () => [
       { title: t.pickSheet.offset, items: sheets.filter((s) => s.group === 'offset') },
       { title: t.pickSheet.digital, items: sheets.filter((s) => s.group === 'digital') },
+      { title: t.pickSheet.large, items: sheets.filter((s) => s.group === 'large') },
     ],
     [sheets],
   );
