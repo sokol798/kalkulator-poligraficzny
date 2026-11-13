@@ -3,9 +3,8 @@ import { useMemo, useState } from 'react';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 
 import { PlusIcon, SearchIcon, TrashIcon } from '@/components/icons';
-import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { TextField } from '@/components/text-field';
-import { Chip, Empty, FormatThumb, IconButton, Label, ListItem, Screen, SectionLabel, Segmented, TabHeader, Text } from '@/components/ui';
+import { Chip, Empty, FormatThumb, IconButton, Label, ListItem, Screen, SectionLabel, Segmented, StackHeader, Text } from '@/components/ui';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
 import type { LibraryFormat, LibrarySheet } from '@/lib/library-data';
@@ -23,9 +22,9 @@ export function LibraryScreen() {
 
   return (
     <Screen
-      bottomInset={TAB_BAR_HEIGHT + spacing.md} footer
+      footer
       header={
-        <TabHeader
+        <StackHeader
           title={t.library.title}
           right={
             <IconButton dark accessibilityLabel={isSheets ? t.library.addSheet : t.library.addFormat} onPress={() => router.push(isSheets ? '/new-sheet' : '/new-format')}>

@@ -3,8 +3,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { StarIcon } from '@/components/icons';
-import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
-import { Chip, Empty, Label, ListItem, Screen, SectionLabel, Segmented, TabHeader, Text } from '@/components/ui';
+import { Chip, Empty, Label, ListItem, Screen, SectionLabel, Segmented, StackHeader, Text } from '@/components/ui';
 import { t } from '@/i18n/pl';
 import { dayBucket, fmtDec, fmtInt, fmtTime } from '@/lib/format';
 import { useAppStore, type HistoryEntry } from '@/store/app-store';
@@ -42,7 +41,7 @@ export function HistoryScreen() {
   };
 
   return (
-    <Screen bottomInset={TAB_BAR_HEIGHT + spacing.md} footer header={<TabHeader title={t.history.title} right={<Label>{t.history.range}</Label>} />}>
+    <Screen footer header={<StackHeader title={t.history.title} right={<Label>{t.history.range}</Label>} />}>
       <Segmented<Filter> surface value={filter} onChange={setFilter} options={[{ value: 'all', label: t.history.all }, { value: 'starred', label: t.history.starred }]} />
       {groups.length === 0 ? <Empty>{filter === 'starred' ? t.history.emptyStarred : t.history.empty}</Empty> : null}
       {groups.map((g) => (

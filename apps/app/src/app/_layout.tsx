@@ -30,13 +30,16 @@ export default function RootLayout() {
     <ThemeProvider value={{ ...nav, colors: { ...nav.colors, background: colors.bg, card: colors.surface, border: colors.border, text: colors.ink, primary: colors.ink } }}>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="index" />
+        <Stack.Screen name="library" />
+        <Stack.Screen name="history" />
         <Stack.Screen name="pick-format" options={sheet} />
         <Stack.Screen name="pick-sheet" options={sheet} />
         <Stack.Screen name="card" />
         <Stack.Screen name="new-format" />
         <Stack.Screen name="new-sheet" />
-        <Stack.Screen name="settings" />
+        <Stack.Screen name="settings/index" />
+        <Stack.Screen name="settings/[item]" />
         <Stack.Screen name="help" />
       </Stack>
     </ThemeProvider>

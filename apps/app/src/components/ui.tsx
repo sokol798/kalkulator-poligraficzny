@@ -272,7 +272,7 @@ export function Footer() {
   return (
     <View style={styles.footer}>
       <Text variant="small" color="muted" style={{ textAlign: 'center' }}>
-        {`© ${new Date().getFullYear()} ${t.footer.owner} ® · ${t.footer.rights}`}
+        {`© ${new Date().getFullYear()} ${t.footer.owner} ®`}
       </Text>
     </View>
   );

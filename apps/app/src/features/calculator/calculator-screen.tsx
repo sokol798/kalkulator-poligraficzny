@@ -1,15 +1,14 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BookmarkIcon, ChevronDown, ChevronRight, GearIcon } from '@/components/icons';
 import { FunctionsMenu, MenuTitle } from '@/features/calculator/functions-menu';
 import { NumberField } from '@/components/number-field';
 import { SheetPreview } from '@/components/sheet-preview';
-import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
 import { QuantityDrum, stepQuantity } from '@/components/quantity-drum';
 import { Card, Chip, IconButton, Label, PillButton, Screen, TabHeader, Text } from '@/components/ui';
-import { summaryOf, useAutoSave } from '@/features/calculator/use-auto-save';
+import { summaryOf } from '@/features/calculator/use-auto-save';
 import { useCalculation } from '@/hooks/use-calculation';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
@@ -31,7 +30,22 @@ export function CalculatorScreen() {
   const currentEntryId = useAppStore((s) => s.currentEntryId);
   const starred = useAppStore((s) => (s.currentEntryId ? s.history.find((h) => h.id === s.currentEntryId)?.starred : false)) ?? false;
   const calc = useCalculation();
-  useAutoSave(calc);
+  const [computed, setComputed] = useState(false);
+  const firstRender = useRef(true);
+
+  // Wynik pokazujemy dopiero po „Oblicz”; każda zmiana danych chowa go ponownie.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    setComputed(false);
+  }, [inputs]);
+
+  const compute = () => {
+    setComputed(true);
+    if (settings.autoSave && calc.ups > 0) saveCurrent(summaryOf(calc));
+  };
   const [customGrammage, setCustomGrammage] = useState(!QUICK_GRAMMAGES.includes(inputs.grammage));
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -53,7 +67,6 @@ export function CalculatorScreen() {
 
   return (
     <Screen
-      bottomInset={TAB_BAR_HEIGHT + spacing.md}
       footer
       header={
         <TabHeader
@@ -194,7 +207,8 @@ export function CalculatorScreen() {
         <Text variant="label">{t.calc.change}</Text>
       </Pressable>
 
-      {/* Wynik */}
+      {/* Wynik – po kliknięciu „Oblicz” */}
+      {computed ? (
       <Card>
         <View style={styles.resultRow}>
           <View style={{ flex: 1, gap: 4 }}>
@@ -226,12 +240,19 @@ export function CalculatorScreen() {
           <SheetPreview result={calc.imposition} maxWidth={86} maxHeight={120} onPress={() => router.push('/card')} accessibilityLabel={t.calc.preview} />
         </View>
       </Card>
+      ) : null}
 
       <View style={styles.actions}>
-        <PillButton title={t.calc.card} onPress={() => router.push('/card')} icon={<ChevronRight color={theme.onInk} />} style={{ flex: 1 }} disabled={!calc.ups} />
-        <IconButton accessibilityLabel={starred ? t.calc.saved : t.calc.save} onPress={onSave} bordered size={50}>
-          <BookmarkIcon color={theme.ink} filled={starred} />
-        </IconButton>
+        {computed ? (
+          <>
+            <PillButton title={t.calc.card} onPress={() => router.push('/card')} icon={<ChevronRight color={theme.onInk} />} style={{ flex: 1 }} disabled={!calc.ups} />
+            <IconButton accessibilityLabel={starred ? t.calc.saved : t.calc.save} onPress={onSave} bordered size={50}>
+              <BookmarkIcon color={theme.ink} filled={starred} />
+            </IconButton>
+          </>
+        ) : (
+          <PillButton title={t.calc.compute} onPress={compute} style={{ flex: 1 }} />
+        )}
       </View>
     </Screen>
   );
