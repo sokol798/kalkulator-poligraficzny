@@ -7,7 +7,7 @@ import { FunctionsMenu, MenuTitle } from '@/features/calculator/functions-menu';
 import { NumberField } from '@/components/number-field';
 import { SheetPreview } from '@/components/sheet-preview';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
-import { QuantityRuler, stepQuantity } from '@/components/quantity-ruler';
+import { QuantityDrum, stepQuantity } from '@/components/quantity-drum';
 import { Card, Chip, IconButton, Label, PillButton, Screen, TabHeader, Text } from '@/components/ui';
 import { summaryOf, useAutoSave } from '@/features/calculator/use-auto-save';
 import { useCalculation } from '@/hooks/use-calculation';
@@ -116,7 +116,7 @@ export function CalculatorScreen() {
           <NumberField value={inputs.quantity} onChange={(v) => setInput('quantity', Math.min(QUANTITY_MAX, v))} decimals={0} max={QUANTITY_MAX} size="lg" format={fmtInt} accessibilityLabel={t.calc.quantity} />
           <StepButton label="+" onPress={() => step(1)} accessibilityLabel={t.calc.moreQty} />
         </View>
-        <QuantityRuler value={inputs.quantity} onChange={(q) => setInput('quantity', q)} accessibilityLabel={t.calc.quantity} />
+        <QuantityDrum value={inputs.quantity} onChange={(q) => setInput('quantity', q)} />
       </Card>
 
       {/* Arkusz */}
