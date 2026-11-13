@@ -120,7 +120,7 @@ function SheetsList() {
         <FormatThumb width={s.width} height={s.height} max={46} />
         <View style={{ flex: 1 }}>
           <Text variant="item">{s.name}</Text>
-          <Label>{`${unit.fmtSize(s.width, s.height)} · ${s.gripper ? `${t.library.gripper} ${unit.fmt(s.gripper)}` : `${t.library.margin} ${unit.fmt(s.margin)}`}`}</Label>
+          <Label>{`${unit.fmtSize(s.width, s.height)} · ${t.library.margins} ${unit.fmt(s.marginTop)} / ${unit.fmt(s.marginSides)}`}</Label>
         </View>
         {!s.builtin ? (
           <IconButton accessibilityLabel={`${t.library.delete} ${s.name}`} onPress={() => confirmDelete(s.name, () => removeSheet(s.id))} size={36}>

@@ -5,7 +5,7 @@ import type { Calculation } from '@/hooks/use-calculation';
 import { useAppStore, type HistoryEntry } from '@/store/app-store';
 
 export function summaryOf(c: Calculation): HistoryEntry['summary'] {
-  return { sheets: c.sheets, ups: c.ups, sheetName: c.sheet.name, weightKg: c.totalWeightKg, formatName: c.formatName };
+  return { sheets: c.grossSheets, ups: c.ups, sheetName: c.sheet.name, weightKg: c.totalWeightKg, formatName: c.formatName, cost: c.cost };
 }
 
 export function useAutoSave(calc: Calculation) {

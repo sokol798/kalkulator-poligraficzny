@@ -8,8 +8,8 @@ import { findFormat, findSheet, useAppStore, type CalcInputs, type Settings } fr
 export interface ResolvedSheet {
   name: string;
   size: Size;
-  gripper: number;
-  margin: number;
+  marginTop: number;
+  marginSides: number;
   isCustom: boolean;
 }
 
@@ -19,9 +19,18 @@ export interface Calculation {
   imposition: ImpositionResult;
   ups: number;
   utilization: number; // 0–100
+  /** Arkuszy netto (po zaokrągleniu). */
   sheets: number;
+  /** Naddatek w arkuszach (0, gdy wyłączony). */
+  wasteSheets: number;
+  /** Arkuszy do zakupu (netto + naddatek). */
+  grossSheets: number;
   /** Użytków na ostatnim (niepełnym) arkuszu. */
   lastSheetUps: number;
+  /** Zapełnienie ostatniego arkusza, 0–100. */
+  lastSheetPercent: number;
+  /** Koszt papieru (brutto × cena za arkusz) lub null, gdy wyłączony. */
+  cost: number | null;
   sheetWeightG: number;
   totalWeightKg: number;
   pieceWeightG: number;
@@ -32,10 +41,10 @@ export interface Calculation {
 export function resolveSheet(inputs: CalcInputs, mySheets: LibrarySheet[]): ResolvedSheet {
   if (inputs.customSheet) {
     const c = inputs.customSheet;
-    return { name: `${trim(c.width)} × ${trim(c.height)}`, size: { width: c.width, height: c.height }, gripper: c.gripper, margin: 5, isCustom: true };
+    return { name: `${trim(c.width)} × ${trim(c.height)}`, size: { width: c.width, height: c.height }, marginTop: c.marginTop, marginSides: c.marginSides, isCustom: true };
   }
-  const s = findSheet(inputs.sheetId, mySheets) ?? findSheet('sh-b2', [])!;
-  return { name: s.name, size: { width: s.width, height: s.height }, gripper: s.gripper, margin: s.margin, isCustom: false };
+  const s = findSheet(inputs.sheetId, mySheets) ?? findSheet('sh-b1', [])!;
+  return { name: s.name, size: { width: s.width, height: s.height }, marginTop: s.marginTop, marginSides: s.marginSides, isCustom: false };
 }
 
 export function buildImpositionInput(inputs: CalcInputs, sheet: ResolvedSheet): ImpositionInput {
@@ -44,9 +53,9 @@ export function buildImpositionInput(inputs: CalcInputs, sheet: ResolvedSheet): 
     item: { width: inputs.width, height: inputs.height },
     bleed: inputs.bleed,
     gutter: 0,
-    margins: { top: sheet.gripper, right: sheet.margin, bottom: sheet.margin, left: sheet.margin },
-    allowMixed: inputs.orientation === 'auto',
-    ...(inputs.orientation !== 'auto' ? { forceOrientation: inputs.orientation } : {}),
+    margins: { top: sheet.marginTop, right: sheet.marginSides, bottom: sheet.marginSides, left: sheet.marginSides },
+    // Zawsze wybieramy układ z największą liczbą użytków (najmniej arkuszy), w tym mieszany.
+    allowMixed: true,
   };
 }
 
@@ -60,8 +69,12 @@ export function computeCalculation(inputs: CalcInputs, settings: Settings, myShe
   const ups = imposition.best?.ups ?? 0;
   const net = calculateSheets({ quantity: inputs.quantity, ups, wastePercent: 0, wasteMinSheets: 0 });
   const sheets = roundSheets(net.netSheets, settings.rounding);
+  const wasteSheets = settings.wasteEnabled && sheets > 0 ? Math.max(Math.ceil((sheets * Math.max(0, inputs.wastePercent)) / 100), Math.max(0, settings.wasteMinSheets)) : 0;
+  const grossSheets = sheets + wasteSheets;
   const lastSheetUps = ups > 0 && net.netSheets > 0 ? inputs.quantity - (net.netSheets - 1) * ups : 0;
-  const paper = calculatePaper({ sheet: sheet.size, grammage: inputs.grammage, sheets });
+  const lastSheetPercent = ups > 0 ? Math.round((lastSheetUps / ups) * 100) : 0;
+  const paper = calculatePaper({ sheet: sheet.size, grammage: inputs.grammage, sheets: grossSheets });
+  const cost = settings.priceEnabled && inputs.pricePerSheet > 0 ? round(grossSheets * inputs.pricePerSheet, 2) : null;
   const pieceWeightG = ((inputs.width * inputs.height) / 1_000_000) * inputs.grammage;
   return {
     sheet,
@@ -70,7 +83,11 @@ export function computeCalculation(inputs: CalcInputs, settings: Settings, myShe
     ups,
     utilization: Math.round((imposition.best?.utilization ?? 0) * 100),
     sheets,
+    wasteSheets,
+    grossSheets,
     lastSheetUps,
+    lastSheetPercent,
+    cost,
     sheetWeightG: paper.sheetWeightG,
     totalWeightKg: paper.totalWeightKg,
     pieceWeightG: round(pieceWeightG, 2),

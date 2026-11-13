@@ -22,7 +22,8 @@ export function PickSheetScreen() {
   const rounding = useAppStore((s) => s.settings.rounding);
   const { applySheet, applyCustomSheet } = useAppStore();
   const calc = useCalculation();
-  const [custom, setCustom] = useState({ width: inputs.customSheet?.width ?? 0, height: inputs.customSheet?.height ?? 0, gripper: inputs.customSheet?.gripper ?? 10 });
+  const settings = useAppStore((s) => s.settings);
+  const [custom, setCustom] = useState({ width: inputs.customSheet?.width ?? 0, height: inputs.customSheet?.height ?? 0, marginTop: inputs.customSheet?.marginTop ?? settings.marginTop, marginSides: inputs.customSheet?.marginSides ?? settings.marginSides });
 
   const rows = useMemo(
     () =>
@@ -58,7 +59,7 @@ export function PickSheetScreen() {
                   {r.sheet.name}
                 </Text>
                 <Label style={{ flex: 1 }} >
-                  {`${unit.fmtSize(r.sheet.width, r.sheet.height, false)} · ${r.sheet.gripper ? `${t.pickSheet.gripper} ${unit.fmt(r.sheet.gripper)}` : `${t.library.margin} ${unit.fmt(r.sheet.margin)}`}`}
+                  {`${unit.fmtSize(r.sheet.width, r.sheet.height, false)} · ${t.pickSheet.margins} ${unit.fmt(r.sheet.marginTop)} / ${unit.fmt(r.sheet.marginSides)}`}
                 </Label>
                 <Text variant="label" color={r.ups ? 'ink' : 'muted'}>
                   {r.ups ? `${r.ups} · ${fmtInt(r.sheets)} ${t.pickSheet.ark}` : '—'}
@@ -101,7 +102,8 @@ export function PickSheetScreen() {
             ×
           </Text>
           <NumberField value={unit.toDisplay(custom.height)} onChange={(v) => setCustom({ ...custom, height: unit.fromDisplay(v) })} decimals={unit.digits} size="md" placeholder={t.pickSheet.h} caption={`${t.pickSheet.h} ${unit.unit}`} accessibilityLabel={`${t.pickSheet.h} ${unit.unit}`} format={(n) => (n ? String(n).replace('.', ',') : '')} />
-          <NumberField value={unit.toDisplay(custom.gripper)} onChange={(v) => setCustom({ ...custom, gripper: unit.fromDisplay(v) })} decimals={unit.digits} size="md" placeholder={t.pickSheet.gripper} caption={`${t.pickSheet.gripper} ${unit.unit}`} accessibilityLabel={`${t.pickSheet.gripper} ${unit.unit}`} />
+          <NumberField value={unit.toDisplay(custom.marginTop)} onChange={(v) => setCustom({ ...custom, marginTop: unit.fromDisplay(v) })} decimals={unit.digits} size="md" caption={`${t.pickSheet.marginTop} ${unit.unit}`} accessibilityLabel={`${t.pickSheet.marginTop} ${unit.unit}`} />
+          <NumberField value={unit.toDisplay(custom.marginSides)} onChange={(v) => setCustom({ ...custom, marginSides: unit.fromDisplay(v) })} decimals={unit.digits} size="md" caption={`${t.pickSheet.marginSides} ${unit.unit}`} accessibilityLabel={`${t.pickSheet.marginSides} ${unit.unit}`} />
         </View>
       </View>
       <PillButton title={t.pickSheet.useCustom} onPress={useCustom} disabled={!(custom.width > 0 && custom.height > 0)} />

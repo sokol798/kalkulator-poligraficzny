@@ -8,28 +8,41 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { BUILTIN_FORMATS, BUILTIN_SHEETS, newId, type LibraryFormat, type LibrarySheet } from '@/lib/library-data';
 
-export type OrientationChoice = 'auto' | 'portrait' | 'landscape';
 export type Rounding = 'up' | 'ten';
 export type Unit = 'mm' | 'cm';
 
 export interface Settings {
+  /** Spad domyślny, mm. */
   bleed: number;
-  gripper: number;
+  /** Marginesy domyślne dla własnych arkuszy, mm. */
+  marginTop: number;
+  marginSides: number;
   grammage: number;
   defaultSheetId: string;
-  orientation: OrientationChoice;
   rounding: Rounding;
+  /** Naddatek technologiczny (opcjonalny). */
+  wasteEnabled: boolean;
+  wastePercent: number;
+  wasteMinSheets: number;
+  /** Koszt papieru (opcjonalny), cena za arkusz. */
+  priceEnabled: boolean;
+  pricePerSheet: number;
   autoSave: boolean;
   unit: Unit;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   bleed: 3,
-  gripper: 10,
+  marginTop: 10,
+  marginSides: 5,
   grammage: 130,
-  defaultSheetId: 'sh-b2',
-  orientation: 'auto',
+  defaultSheetId: 'sh-b1',
   rounding: 'up',
+  wasteEnabled: false,
+  wastePercent: 5,
+  wasteMinSheets: 0,
+  priceEnabled: false,
+  pricePerSheet: 0,
   autoSave: true,
   unit: 'mm',
 };
@@ -37,7 +50,8 @@ export const DEFAULT_SETTINGS: Settings = {
 export interface CustomSheet {
   width: number;
   height: number;
-  gripper: number;
+  marginTop: number;
+  marginSides: number;
 }
 
 export interface CalcInputs {
@@ -51,7 +65,10 @@ export interface CalcInputs {
   /** Arkusz wpisany ręcznie w arkuszu wyboru (ma pierwszeństwo przed sheetId). */
   customSheet: CustomSheet | null;
   grammage: number;
-  orientation: OrientationChoice;
+  /** Naddatek w % dla tego obliczenia (używany, gdy włączony w ustawieniach). */
+  wastePercent: number;
+  /** Cena za arkusz dla tego obliczenia (używana, gdy włączona w ustawieniach). */
+  pricePerSheet: number;
 }
 
 export interface HistoryEntry {
@@ -60,7 +77,7 @@ export interface HistoryEntry {
   name: string;
   starred: boolean;
   inputs: CalcInputs;
-  summary: { sheets: number; ups: number; sheetName: string; weightKg: number; formatName: string };
+  summary: { sheets: number; ups: number; sheetName: string; weightKg: number; formatName: string; cost: number | null };
 }
 
 interface AppState {
@@ -81,6 +98,8 @@ interface AppState {
   loadInputs: (inputs: CalcInputs) => void;
 
   setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  resetSettings: () => void;
+  clearHistory: () => void;
 
   upsertFormat: (format: LibraryFormat) => void;
   removeFormat: (id: string) => void;
@@ -104,7 +123,8 @@ function inputsFromSettings(s: Settings): CalcInputs {
     sheetId: s.defaultSheetId,
     customSheet: null,
     grammage: s.grammage,
-    orientation: s.orientation,
+    wastePercent: s.wastePercent,
+    pricePerSheet: s.pricePerSheet,
   };
 }
 
@@ -132,6 +152,8 @@ export const useAppStore = create<AppState>()(
       loadInputs: (inputs) => set({ inputs: { ...inputs }, currentEntryId: null }),
 
       setSetting: (key, value) => set((s) => ({ settings: { ...s.settings, [key]: value } })),
+      resetSettings: () => set({ settings: DEFAULT_SETTINGS }),
+      clearHistory: () => set((s) => ({ history: s.history.filter((h) => h.starred), currentEntryId: null })),
 
       upsertFormat: (format) =>
         set((s) => ({ formats: s.formats.some((f) => f.id === format.id) ? s.formats.map((f) => (f.id === format.id ? format : f)) : [format, ...s.formats] })),
@@ -165,8 +187,8 @@ export const useAppStore = create<AppState>()(
       removeEntry: (id) => set((s) => ({ history: s.history.filter((h) => h.id !== id), currentEntryId: s.currentEntryId === id ? null : s.currentEntryId })),
     }),
     {
-      name: 'printcalc-v2',
-      version: 2,
+      name: 'printcalc-v3',
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({ inputs: s.inputs, currentEntryId: s.currentEntryId, settings: s.settings, formats: s.formats, sheets: s.sheets, history: s.history }),
     },

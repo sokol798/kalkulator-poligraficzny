@@ -8,7 +8,7 @@ import { TextField } from '@/components/text-field';
 import { Card, Chip, IconButton, Label, PillButton, Row, Screen, Segmented, StackHeader, Text, Toggle } from '@/components/ui';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
-import { GRIPPER_OPTIONS, newId, type LibrarySheet, type SheetGroup } from '@/lib/library-data';
+import { MARGIN_SIDES_OPTIONS, MARGIN_TOP_OPTIONS, newId, type LibrarySheet, type SheetGroup } from '@/lib/library-data';
 import { useAppStore } from '@/store/app-store';
 import { spacing } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -18,19 +18,20 @@ export function NewSheetScreen() {
   const unit = useUnit();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const editing = useAppStore((s) => s.sheets.find((x) => x.id === id));
-  const defaultSheetId = useAppStore((s) => s.settings.defaultSheetId);
+  const settings = useAppStore((s) => s.settings);
+  const defaultSheetId = settings.defaultSheetId;
   const { upsertSheet, setSetting, applySheet } = useAppStore();
 
   const [width, setWidth] = useState(editing?.width ?? 640);
   const [height, setHeight] = useState(editing?.height ?? 900);
   const [name, setName] = useState(editing?.name ?? '');
-  const [gripper, setGripper] = useState(editing?.gripper ?? 10);
-  const [margin, setMargin] = useState(editing?.margin ?? 5);
+  const [marginTop, setMarginTop] = useState(editing?.marginTop ?? settings.marginTop);
+  const [marginSides, setMarginSides] = useState(editing?.marginSides ?? settings.marginSides);
   const [group, setGroup] = useState<SheetGroup>(editing?.group ?? 'offset');
   const [makeDefault, setMakeDefault] = useState(editing ? editing.id === defaultSheetId : false);
 
   const save = (use: boolean) => {
-    const s: LibrarySheet = { id: editing?.id ?? newId('sh'), name: name.trim() || `${unit.fmt(width)} × ${unit.fmt(height)}`, width, height, gripper, margin, group };
+    const s: LibrarySheet = { id: editing?.id ?? newId('sh'), name: name.trim() || `${unit.fmt(width)} × ${unit.fmt(height)}`, width, height, marginTop, marginSides, group };
     upsertSheet(s);
     if (makeDefault) setSetting('defaultSheetId', s.id);
     if (use) {
@@ -72,16 +73,20 @@ export function NewSheetScreen() {
         <TextField value={name} onChangeText={setName} placeholder={t.newSheet.namePlaceholder} accessibilityLabel={t.newSheet.name} />
       </Card>
       <Card>
-        <Label>{t.newSheet.gripper}</Label>
+        <Label>{t.newSheet.marginTop}</Label>
         <View style={styles.chips}>
-          {GRIPPER_OPTIONS.map((g) => (
-            <Chip key={g} small label={unit.fmt(g)} on={gripper === g} onPress={() => setGripper(g)} />
+          {MARGIN_TOP_OPTIONS.map((g) => (
+            <Chip key={g} small label={unit.fmt(g)} on={marginTop === g} onPress={() => setMarginTop(g)} />
           ))}
-          <NumberField value={GRIPPER_OPTIONS.includes(gripper) ? 0 : unit.toDisplay(gripper)} onChange={(v) => setGripper(unit.fromDisplay(v))} decimals={unit.digits} size="sm" pill placeholder={t.newFormat.otherBleed} accessibilityLabel={`${t.newSheet.gripper} ${t.newFormat.otherBleed}`} format={(n) => (n ? String(n).replace('.', ',') : '')} width={80} />
+          <NumberField value={MARGIN_TOP_OPTIONS.includes(marginTop) ? 0 : unit.toDisplay(marginTop)} onChange={(v) => setMarginTop(unit.fromDisplay(v))} decimals={unit.digits} size="sm" pill placeholder={t.newFormat.otherBleed} accessibilityLabel={`${t.newSheet.marginTop} ${t.newFormat.otherBleed}`} format={(n) => (n ? String(n).replace('.', ',') : '')} width={80} />
         </View>
-        <Row title={t.newSheet.margin} hint={unit.unit}>
-          <NumberField value={unit.toDisplay(margin)} onChange={(v) => setMargin(unit.fromDisplay(v))} decimals={unit.digits} size="sm" accessibilityLabel={t.newSheet.margin} width={72} />
-        </Row>
+        <Label style={{ marginTop: spacing.sm }}>{t.newSheet.marginSides}</Label>
+        <View style={styles.chips}>
+          {MARGIN_SIDES_OPTIONS.map((g) => (
+            <Chip key={g} small label={unit.fmt(g)} on={marginSides === g} onPress={() => setMarginSides(g)} />
+          ))}
+          <NumberField value={MARGIN_SIDES_OPTIONS.includes(marginSides) ? 0 : unit.toDisplay(marginSides)} onChange={(v) => setMarginSides(unit.fromDisplay(v))} decimals={unit.digits} size="sm" pill placeholder={t.newFormat.otherBleed} accessibilityLabel={`${t.newSheet.marginSides} ${t.newFormat.otherBleed}`} format={(n) => (n ? String(n).replace('.', ',') : '')} width={80} />
+        </View>
         <Row title={t.newSheet.group}>
           <Segmented<SheetGroup> value={group} onChange={setGroup} options={[{ value: 'offset', label: t.newSheet.offset }, { value: 'digital', label: t.newSheet.digital }]} style={{ width: 170 }} />
         </Row>

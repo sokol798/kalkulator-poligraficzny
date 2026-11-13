@@ -63,7 +63,7 @@ print-calc/
 | Spad | `bleed` | Naddatek grafiki na każdą krawędź; użytek brutto = netto + 2×spad. |
 | Odstęp | `gutter` | Przerwa między użytkami brutto (np. na znaczniki cięcia). Ostatni użytek w rzędzie nie potrzebuje odstępu. |
 | Arkusz | `sheet` | Arkusz drukowy (np. B1 707×1000, SRA3 320×450). |
-| Chwyt (łapka) | `margins.top` | Pas chwytu maszyny, nie do zadruku. W aplikacji przypisany do arkusza. |
+| Margines górny | `margins.top` | Pas chwytu maszyny, nie do zadruku. W aplikacji przypisany do arkusza razem z marginesami bocznymi/dolnym. |
 | Marginesy | `margins.*` | Pozostałe pasy nie do zadruku. Obszar zadruku = arkusz − marginesy. |
 | Układ | `Layout` | Konkretne rozmieszczenie: strategia, kolumny × wiersze, lista pozycji, wykorzystanie, resztki. |
 | Nakład | `quantity` | Liczba egzemplarzy do wydrukowania. |
@@ -100,7 +100,7 @@ Wyniki nie są przechowywane – zawsze wyliczane z wejścia, więc nie ma stanu
 
 | Trasa | Ekran | Zawartość |
 |---|---|---|
-| `/` | Kalkulator | Chipy formatów (A5/A4/A6/DL/Więcej), szer. × wys., nakład ze stepperem ±100, chipy arkuszy (B2/B1/Więcej), gramatura (80/130/170/300/inna), linia „Spady · chwyt · orientacja · Zmień”, wynik na żywo (arkusze, użytki, %, masa) z miniaturą arkusza i przełącznikiem orientacji (Auto·9 / Pion·9 / Poziom·8), przyciski „Karta zlecenia” i zapis do historii. |
+| `/` | Kalkulator | Chipy formatów (A5/A4/A6/DL/Więcej), szer. × wys., nakład: pole + przyciski ± + przewijana taśma z podziałką (do 500 000), chipy arkuszy (B1/B2/Więcej), gramatura (80/130/170/300/inna), opcjonalnie naddatek % i cena za arkusz (włączane w ustawieniach), linia „Spady · marginesy · Zmień”, wynik na żywo (arkusze do zakupu, użytki, %, masa, koszt) z miniaturą arkusza. Układ użytków zawsze najoszczędniejszy (pion / poziom / mieszany wybierany automatycznie). |
 | `/pick-format` | Wybierz format | Arkusz dolny: szukaj, ostatnio używane, moje, seria A, seria B, inne, „Własny wymiar” → nowy format. |
 | `/pick-sheet` | Wybierz arkusz | Arkusz dolny: Offset / Cyfra, przy każdym arkuszu użytki i liczba arkuszy dla bieżącego nakładu; własny arkusz (szer., wys., chwyt). |
 | `/card` | Karta zlecenia | Nazwa, numerowany rozkład użytków, arkusze/nakład/na arkuszu/papier, tabela szczegółów, PDF i udostępnianie, „Nowe obliczenie”. |

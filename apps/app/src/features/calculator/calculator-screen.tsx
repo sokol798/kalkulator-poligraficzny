@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BookmarkIcon, ChevronDown, ChevronRight, GearIcon } from '@/components/icons';
@@ -7,14 +7,15 @@ import { FunctionsMenu, MenuTitle } from '@/features/calculator/functions-menu';
 import { NumberField } from '@/components/number-field';
 import { SheetPreview } from '@/components/sheet-preview';
 import { TAB_BAR_HEIGHT } from '@/components/tab-bar';
-import { Card, Chip, IconButton, Label, PillButton, Screen, Segmented, TabHeader, Text } from '@/components/ui';
+import { QuantityRuler, stepQuantity } from '@/components/quantity-ruler';
+import { Card, Chip, IconButton, Label, PillButton, Screen, TabHeader, Text } from '@/components/ui';
 import { summaryOf, useAutoSave } from '@/features/calculator/use-auto-save';
-import { computeCalculation, useCalculation } from '@/hooks/use-calculation';
+import { useCalculation } from '@/hooks/use-calculation';
 import { useUnit } from '@/hooks/use-unit';
 import { t } from '@/i18n/pl';
 import { fmtDec, fmtInt } from '@/lib/format';
-import { BUILTIN_FORMATS, BUILTIN_SHEETS, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, QUICK_SHEET_IDS } from '@/lib/library-data';
-import { findFormat, findSheet, useAppStore, type OrientationChoice } from '@/store/app-store';
+import { BUILTIN_FORMATS, BUILTIN_SHEETS, QUANTITY_MAX, QUICK_FORMAT_IDS, QUICK_GRAMMAGES, QUICK_SHEET_IDS, WASTE_OPTIONS } from '@/lib/library-data';
+import { findFormat, findSheet, useAppStore } from '@/store/app-store';
 import { layout, spacing } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
 import { Pressable } from 'react-native';
@@ -34,12 +35,6 @@ export function CalculatorScreen() {
   const [customGrammage, setCustomGrammage] = useState(!QUICK_GRAMMAGES.includes(inputs.grammage));
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* Liczba użytków dla każdej orientacji (etykiety segmentów). */
-  const upsBy = useMemo(() => {
-    const f = (o: OrientationChoice) => computeCalculation({ ...inputs, orientation: o }, settings, mySheets, '').ups;
-    return { auto: f('auto'), portrait: f('portrait'), landscape: f('landscape') };
-  }, [inputs, settings, mySheets]);
-
   const quickFormats = QUICK_FORMAT_IDS.map((id) => findFormat(id, myFormats)!).filter(Boolean);
   const selectedFormat = findFormat(inputs.formatId, myFormats);
   const showExtraFormat = selectedFormat && !QUICK_FORMAT_IDS.includes(selectedFormat.id);
@@ -53,7 +48,8 @@ export function CalculatorScreen() {
     if (currentEntryId) toggleStar(id);
   };
 
-  const step = (d: number) => setInput('quantity', Math.max(0, inputs.quantity + d));
+  const step = (dir: 1 | -1) => setInput('quantity', Math.min(QUANTITY_MAX, stepQuantity(inputs.quantity, dir)));
+  const customWaste = !WASTE_OPTIONS.includes(inputs.wastePercent);
 
   return (
     <Screen
@@ -85,7 +81,7 @@ export function CalculatorScreen() {
           {quickFormats.map((f) => (
             <Chip key={f.id} label={f.name} on={inputs.formatId === f.id} onPress={() => applyFormat(f)} />
           ))}
-          {showExtraFormat ? <Chip label={selectedFormat!.name} on onPress={() => router.push('/pick-format')} /> : null}
+          {showExtraFormat && selectedFormat ? <Chip label={selectedFormat.name} on onPress={() => router.push('/pick-format')} /> : null}
           <Chip label={t.calc.more} dashed onPress={() => router.push('/pick-format')} icon={<ChevronDown color={theme.ink} />} />
         </View>
         <View style={styles.sizeRow}>
@@ -109,27 +105,31 @@ export function CalculatorScreen() {
         </View>
       </Card>
 
-      {/* Nakład + arkusz */}
-      <View style={styles.twoCol}>
-        <Card style={styles.col}>
+      {/* Nakład */}
+      <Card>
+        <View style={styles.between}>
           <Label>{t.calc.quantity}</Label>
-          <View style={styles.stepper}>
-            <StepButton label="−" onPress={() => step(-100)} accessibilityLabel={t.calc.less} />
-            <NumberField value={inputs.quantity} onChange={(v) => setInput('quantity', v)} decimals={0} size="md" format={fmtInt} accessibilityLabel={t.calc.quantity} />
-            <StepButton label="+" onPress={() => step(100)} accessibilityLabel={t.calc.moreQty} />
-          </View>
-        </Card>
-        <Card style={styles.col}>
-          <Label>{t.calc.sheet}</Label>
-          <View style={styles.chips}>
-            {quickSheets.map((s) => (
-              <Chip key={s.id} small label={s.name} on={!inputs.customSheet && inputs.sheetId === s.id} onPress={() => applySheet(s.id)} />
-            ))}
-            {showExtraSheet ? <Chip small label={calc.sheet.name} on onPress={() => router.push('/pick-sheet')} /> : null}
-            <Chip small label={t.calc.more} dashed onPress={() => router.push('/pick-sheet')} icon={<ChevronDown color={theme.ink} />} />
-          </View>
-        </Card>
-      </View>
+          <Label style={{ fontSize: 11 }}>{t.calc.quantityMax}</Label>
+        </View>
+        <View style={styles.stepper}>
+          <StepButton label="−" onPress={() => step(-1)} accessibilityLabel={t.calc.less} />
+          <NumberField value={inputs.quantity} onChange={(v) => setInput('quantity', Math.min(QUANTITY_MAX, v))} decimals={0} max={QUANTITY_MAX} size="lg" format={fmtInt} accessibilityLabel={t.calc.quantity} />
+          <StepButton label="+" onPress={() => step(1)} accessibilityLabel={t.calc.moreQty} />
+        </View>
+        <QuantityRuler value={inputs.quantity} onChange={(q) => setInput('quantity', q)} accessibilityLabel={t.calc.quantity} />
+      </Card>
+
+      {/* Arkusz */}
+      <Card>
+        <Label>{t.calc.sheet}</Label>
+        <View style={styles.chips}>
+          {quickSheets.map((s) => (
+            <Chip key={s.id} small label={s.name} on={!inputs.customSheet && inputs.sheetId === s.id} onPress={() => applySheet(s.id)} />
+          ))}
+          {showExtraSheet ? <Chip small label={calc.sheet.name} on onPress={() => router.push('/pick-sheet')} /> : null}
+          <Chip small label={t.calc.more} dashed onPress={() => router.push('/pick-sheet')} icon={<ChevronDown color={theme.ink} />} />
+        </View>
+      </Card>
 
       {/* Papier */}
       <Card style={styles.paperCard}>
@@ -164,8 +164,33 @@ export function CalculatorScreen() {
         </View>
       </Card>
 
+      {settings.wasteEnabled || settings.priceEnabled ? (
+        <Card>
+          {settings.wasteEnabled ? (
+            <>
+              <Label>{t.calc.waste}</Label>
+              <View style={styles.chips}>
+                {WASTE_OPTIONS.map((w) => (
+                  <Chip key={w} small label={`${w} %`} on={!customWaste && inputs.wastePercent === w} onPress={() => setInput('wastePercent', w)} />
+                ))}
+                <NumberField value={customWaste ? inputs.wastePercent : 0} onChange={(v) => setInput('wastePercent', v)} decimals={1} max={100} size="sm" pill placeholder={t.calc.wasteOther} accessibilityLabel={`${t.calc.waste} ${t.calc.wasteOther}`} format={(n) => (customWaste && n > 0 ? String(n).replace('.', ',') : '')} width={64} />
+              </View>
+            </>
+          ) : null}
+          {settings.priceEnabled ? (
+            <View style={[styles.between, { marginTop: settings.wasteEnabled ? spacing.sm : 0 }]}>
+              <Label>{t.calc.price}</Label>
+              <View style={styles.priceRow}>
+                <NumberField value={inputs.pricePerSheet} onChange={(v) => setInput('pricePerSheet', v)} decimals={2} size="md" placeholder={t.calc.pricePlaceholder} accessibilityLabel={t.calc.price} format={(n) => (n > 0 ? String(n).replace('.', ',') : '')} width={100} />
+                <Label>{t.settings.pln}</Label>
+              </View>
+            </View>
+          ) : null}
+        </Card>
+      ) : null}
+
       <Pressable onPress={() => router.push('/settings')} accessibilityRole="link" style={styles.summaryLine}>
-        <Label>{t.calc.summary(unit.fmtWithUnit(inputs.bleed), unit.fmtWithUnit(calc.sheet.gripper), orientationLabel(inputs.orientation).toLowerCase())}</Label>
+        <Label>{t.calc.summary(unit.fmtWithUnit(inputs.bleed), unit.fmt(calc.sheet.marginTop), unit.fmtWithUnit(calc.sheet.marginSides))}</Label>
         <Text variant="label">{t.calc.change}</Text>
       </Pressable>
 
@@ -175,7 +200,7 @@ export function CalculatorScreen() {
           <View style={{ flex: 1, gap: 4 }}>
             <Label>{t.calc.youNeed}</Label>
             <Text variant="hero" color={calc.ups ? 'ink' : 'muted'}>
-              {calc.ups ? fmtInt(calc.sheets) : '—'}
+              {calc.ups ? fmtInt(calc.grossSheets) : '—'}
             </Text>
             {calc.ups ? (
               <>
@@ -185,6 +210,12 @@ export function CalculatorScreen() {
                 <Text variant="body">
                   {t.calc.paperWeight(fmtDec(calc.totalWeightKg, 1))} <Label>{t.calc.perPiece(fmtDec(calc.pieceWeightG, 1), fmtDec(calc.runWeightKg, 1))}</Label>
                 </Text>
+                {calc.wasteSheets > 0 || calc.cost != null ? (
+                  <Text variant="body">
+                    {calc.cost != null ? t.calc.cost(fmtDec(calc.cost, 2)) : ''}
+                    {calc.wasteSheets > 0 ? <Label>{`${calc.cost != null ? ' · ' : ''}${t.calc.plusWaste(fmtInt(calc.wasteSheets))}`}</Label> : null}
+                  </Text>
+                ) : null}
               </>
             ) : (
               <Text variant="label" color="danger">
@@ -194,15 +225,6 @@ export function CalculatorScreen() {
           </View>
           <SheetPreview result={calc.imposition} maxWidth={86} maxHeight={120} onPress={() => router.push('/card')} accessibilityLabel={t.calc.preview} />
         </View>
-        <Segmented<OrientationChoice>
-          value={inputs.orientation}
-          onChange={(v) => setInput('orientation', v)}
-          options={[
-            { value: 'auto', label: `${t.calc.orientationAuto} · ${upsBy.auto}` },
-            { value: 'portrait', label: `${t.calc.orientationPortrait} · ${upsBy.portrait}` },
-            { value: 'landscape', label: `${t.calc.orientationLandscape} · ${upsBy.landscape}` },
-          ]}
-        />
       </Card>
 
       <View style={styles.actions}>
@@ -224,8 +246,9 @@ function StepButton({ label, onPress, accessibilityLabel }: { label: string; onP
   );
 }
 
-export function orientationLabel(o: OrientationChoice): string {
-  return o === 'auto' ? t.calc.orientationAuto : o === 'portrait' ? t.calc.orientationPortrait : t.calc.orientationLandscape;
+/** Opis układu najlepszego wariantu (do karty zlecenia). */
+export function layoutLabel(strategy: 'grid-portrait' | 'grid-landscape' | 'mixed'): string {
+  return strategy === 'mixed' ? t.calc.layoutMixed : strategy === 'grid-portrait' ? t.calc.layoutPortrait : t.calc.layoutLandscape;
 }
 
 /** Eksport do innych ekranów: nazwa arkusza dla id. */
@@ -240,10 +263,10 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, alignItems: 'center' },
   sizeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
   times: { width: 20, textAlign: 'center', marginTop: 13 },
-  twoCol: { flexDirection: 'row', gap: spacing.md },
-  col: { flex: 1, minWidth: 0 },
+  between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  priceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  step: { width: 36, height: layout.control, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  step: { width: 52, height: 52, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   paperCard: { gap: spacing.sm },
   summaryLine: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing.sm, gap: spacing.md },
   resultRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
