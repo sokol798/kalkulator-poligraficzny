@@ -1,0 +1,1 @@
+:root{--lightningcss-light:initial;--lightningcss-dark: ;color-scheme:light dark}@media (prefers-color-scheme:dark){:root{--lightningcss-light: ;--lightningcss-dark:initial}}html,body,#root{height:100%}body{-webkit-font-smoothing:antialiased;margin:0;font-family:Inter,system-ui,sans-serif}input{font-variant-numeric:tabular-nums}
