@@ -26,7 +26,7 @@ export function SettingsScreen() {
   const s = useAppStore((x) => x.settings);
   const mySheets = useAppStore((x) => x.sheets);
   const history = useAppStore((x) => x.history);
-  const { setSetting, resetSettings, clearHistory } = useAppStore();
+  const { setSetting, resetSettings, clearHistory, clearLocalData } = useAppStore();
   const defaultSheet = findSheet(s.defaultSheetId, mySheets);
 
   const Value = ({ children }: { children: string }) => (
@@ -102,6 +102,12 @@ export function SettingsScreen() {
           <ChevronRight color={theme.muted} />
         </Row>
         <Row title={t.settings.howWeCount} onPress={() => router.push('/help')}>
+          <ChevronRight color={theme.muted} />
+        </Row>
+        <Row title="Prywatność i zasady korzystania" onPress={() => router.push('/information')}>
+          <ChevronRight color={theme.muted} />
+        </Row>
+        <Row title="Usuń dane z tego urządzenia" onPress={() => confirm('Usunąć historię, zapisane zlecenia, własne formaty i ustawienia kalkulatora?', clearLocalData)}>
           <ChevronRight color={theme.muted} />
         </Row>
         <Row title={t.settings.resetSettings} onPress={() => confirm(t.settings.resetConfirm, resetSettings)} last>

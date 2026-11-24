@@ -59,11 +59,11 @@ export function NewSheetScreen() {
           <Label>{unit.unit}</Label>
         </View>
         <View style={styles.sizeRow}>
-          <NumberField value={unit.toDisplay(width)} onChange={(v) => setWidth(unit.fromDisplay(v))} decimals={unit.digits} accessibilityLabel={t.calc.width} />
+          <NumberField min={unit.toDisplay(1)} max={unit.toDisplay(10000)} value={unit.toDisplay(width)} onChange={(v) => setWidth(unit.fromDisplay(v))} decimals={unit.digits} accessibilityLabel={t.calc.width} />
           <Text variant="value" color="muted">
             ×
           </Text>
-          <NumberField value={unit.toDisplay(height)} onChange={(v) => setHeight(unit.fromDisplay(v))} decimals={unit.digits} accessibilityLabel={t.calc.height} />
+          <NumberField min={unit.toDisplay(1)} max={unit.toDisplay(10000)} value={unit.toDisplay(height)} onChange={(v) => setHeight(unit.fromDisplay(v))} decimals={unit.digits} accessibilityLabel={t.calc.height} />
         </View>
       </Card>
       <Card>

@@ -5,10 +5,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
+      await Promise.all(keys.filter((key) => /^kalkulator-v\d+$/.test(key)).map((key) => caches.delete(key)));
       await self.registration.unregister();
       const clients = await self.clients.matchAll({ type: 'window' });
-      for (const c of clients) c.navigate(c.url);
+      for (const c of clients) {
+        if (c.url.startsWith(self.registration.scope)) c.navigate(c.url);
+      }
     })(),
   );
 });

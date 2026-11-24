@@ -1,3 +1,4 @@
+import type { ResolvedSheet } from '@/hooks/use-calculation';
 /**
  * Stan aplikacji (zustand + persist): bieżące obliczenie, biblioteka, historia, ustawienia.
  * Wyniki nie są przechowywane – zawsze wyliczane z wejścia (hook use-calculation).
@@ -42,7 +43,7 @@ export const DEFAULT_SETTINGS: Settings = {
   wastePercent: 0,
   wasteMinSheets: 0,
   pricePerSheet: 0,
-  autoSave: true,
+  autoSave: false,
   unit: 'mm',
   theme: 'light',
 };
@@ -59,6 +60,7 @@ export interface CalcInputs {
   height: number;
   /** Id formatu (wbudowanego lub własnego), gdy wymiar pochodzi z listy. */
   formatId: string | null;
+  orientation?: 'portrait' | 'landscape';
   bleed: number;
   quantity: number;
   sheetId: string;
@@ -79,7 +81,7 @@ export interface HistoryEntry {
   name: string;
   starred: boolean;
   inputs: CalcInputs;
-  summary: { sheets: number; ups: number; sheetName: string; weightKg: number; formatName: string; cost: number | null };
+  summary: { sheets: number; ups: number; sheetName: string; weightKg: number; formatName: string; cost: number | null; sheet?: ResolvedSheet; rounding?: Rounding; wasteMinSheets?: number };
 }
 
 interface AppState {
@@ -102,6 +104,7 @@ interface AppState {
   setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   resetSettings: () => void;
   clearHistory: () => void;
+  clearLocalData: () => void;
 
   upsertFormat: (format: LibraryFormat) => void;
   removeFormat: (id: string) => void;
@@ -120,6 +123,7 @@ function inputsFromSettings(s: Settings): CalcInputs {
     width: 148,
     height: 210,
     formatId: 'f-a5',
+    orientation: 'portrait',
     bleed: s.bleed,
     quantity: 1000,
     sheetId: s.defaultSheetId,
@@ -143,20 +147,26 @@ export const useAppStore = create<AppState>()(
       sheets: [],
       history: [],
 
-      setInput: (key, value) => set((s) => ({ inputs: { ...s.inputs, [key]: value } })),
-      setSize: (width, height, formatId = null) => set((s) => ({ inputs: { ...s.inputs, width, height, formatId } })),
+      setInput: (key, value) => set((s) => ({ inputs: { ...s.inputs, [key]: value }, currentEntryId: null })),
+      setSize: (width, height, formatId = null) => set((s) => ({ inputs: { ...s.inputs, width, height, formatId }, currentEntryId: null })),
       applyFormat: (f) =>
         set((s) => ({
           inputs: { ...s.inputs, width: f.width, height: f.height, formatId: f.id, bleed: f.bleed ?? s.settings.bleed },
+          currentEntryId: null,
         })),
-      applySheet: (sheetId) => set((s) => ({ inputs: { ...s.inputs, sheetId, customSheet: null, marginTop: null } })),
-      applyCustomSheet: (customSheet) => set((s) => ({ inputs: { ...s.inputs, customSheet, marginTop: null } })),
+      applySheet: (sheetId) => set((s) => ({ inputs: { ...s.inputs, sheetId, customSheet: null, marginTop: null }, currentEntryId: null })),
+      applyCustomSheet: (customSheet) => set((s) => ({ inputs: { ...s.inputs, customSheet, marginTop: null }, currentEntryId: null })),
       newCalculation: () => set((s) => ({ inputs: inputsFromSettings(s.settings), currentEntryId: null })),
       loadInputs: (inputs) => set({ inputs: { ...inputs }, currentEntryId: null }),
 
-      setSetting: (key, value) => set((s) => ({ settings: { ...s.settings, [key]: value } })),
+      setSetting: (key, value) => set((s) => ({ settings: { ...s.settings, [key]: value }, ...(key === 'rounding' || key === 'wasteMinSheets' ? { currentEntryId: null } : {}) })),
       resetSettings: () => set({ settings: DEFAULT_SETTINGS }),
       clearHistory: () => set((s) => ({ history: s.history.filter((h) => h.starred), currentEntryId: null })),
+
+      clearLocalData: () => {
+        set({ inputs: inputsFromSettings(DEFAULT_SETTINGS), currentEntryId: null, settings: DEFAULT_SETTINGS, formats: [], sheets: [], history: [] });
+        void useAppStore.persist.clearStorage();
+      },
 
       upsertFormat: (format) =>
         set((s) => ({ formats: s.formats.some((f) => f.id === format.id) ? s.formats.map((f) => (f.id === format.id ? format : f)) : [format, ...s.formats] })),
@@ -191,7 +201,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'printcalc-v3',
-      version: 6,
+      version: 7,
       migrate: (persisted, version) => {
         const st = persisted as Partial<AppState>;
         if (version < 4 && st.inputs) st.inputs = { ...st.inputs, marginTop: st.inputs.marginTop ?? null };
@@ -207,6 +217,7 @@ export const useAppStore = create<AppState>()(
           };
           if (st.inputs && !wasteEnabled) st.inputs = { ...st.inputs, wastePercent: 0 };
         }
+        if (version < 7 && st.inputs && !st.currentEntryId) st.inputs = { ...st.inputs, orientation: st.inputs.orientation ?? 'portrait' };
         return st as AppState;
       },
       storage: createJSONStorage(() => AsyncStorage),

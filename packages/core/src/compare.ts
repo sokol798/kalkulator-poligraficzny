@@ -24,7 +24,7 @@ export function compareSheetFormats(
 ): FormatComparison[] {
   const out: FormatComparison[] = [];
   for (const format of formats) {
-    const res = calculateImposition({ ...base, sheet: format.size });
+    const res = calculateImposition({ ...base, sheet: format.size }, 0);
     const ups = res.best?.ups ?? 0;
     if (ups === 0) continue;
     const sheets = calculateSheets({ quantity, ups, wastePercent, wasteMinSheets: 0 });

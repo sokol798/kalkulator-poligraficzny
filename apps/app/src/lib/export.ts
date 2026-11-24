@@ -4,7 +4,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Platform, Share } from 'react-native';
 
-import type { Calculation } from '@/hooks/use-calculation';
+import { strategyLabel, type Calculation } from '@/hooks/use-calculation';
 import { fmtDate, fmtDec, fmtInt } from '@/lib/format';
 import type { CalcInputs, HistoryEntry } from '@/store/app-store';
 
@@ -15,18 +15,18 @@ export function cardText(name: string, inputs: CalcInputs, c: Calculation, when 
     name || `Obliczenie ${c.formatName}`,
     `Arkuszy ${c.sheet.name}: ${fmtInt(c.grossSheets)}${c.wasteSheets ? ` (${fmtInt(c.sheets)} + naddatek ${fmtInt(c.wasteSheets)})` : ''}`,
     `Nakład: ${fmtInt(inputs.quantity)} szt.`,
-    `Układ: ${c.ups} na arkuszu (${c.imposition.best ? `${c.imposition.best.columns} × ${c.imposition.best.rows}` : '—'}), ostatni arkusz ${c.lastSheetPercent} %`,
+    `Układ: ${c.ups} na arkuszu (${strategyLabel(c)}), ostatni arkusz nakładu ${c.lastSheetUps} z ${c.ups} szt.`,
     `Format netto: ${inputs.width} × ${inputs.height} mm, spady ${inputs.bleed} mm (${c.itemWithBleed.width} × ${c.itemWithBleed.height} mm)`,
     `Arkusz: ${c.sheet.name} ${c.sheet.size.width} × ${c.sheet.size.height} mm, marginesy ${c.sheet.marginTop} / ${c.sheet.marginSides} mm`,
     `Wykorzystanie arkusza: ${c.utilization} %`,
     `Papier: ${inputs.grammage} g/m², ${fmtDec(c.totalWeightKg, 1)} kg (${fmtInt(c.grossSheets)} × ${fmtDec(c.sheetWeightG, 1)} g)`,
     ...(c.cost != null ? [`Koszt papieru: ${fmtDec(c.cost, 2)} zł (${fmtInt(c.grossSheets)} × ${fmtDec(inputs.pricePerSheet, 2)} zł)`] : []),
-    `Waga 1 szt. / nakładu: ${fmtDec(c.pieceWeightG, 1)} g / ${fmtDec(c.runWeightKg, 1)} kg`,
     `Data: ${fmtDate(when)}`,
   ].join('\n');
 }
 
 function previewSvg(c: Calculation): string {
+  if (c.imposition.best && !c.imposition.best.items.length) return '<p>Podgląd pominięto ze względu na liczbę użytków.</p>';
   const { sheet, margins } = c.imposition.input;
   const scale = 220 / Math.max(sheet.width, sheet.height);
   const w = sheet.width * scale;
@@ -35,9 +35,9 @@ function previewSvg(c: Calculation): string {
     .map((it, i) => {
       const x = it.x * scale;
       const y = it.y * scale;
-      const iw = it.width * scale - 1;
-      const ih = it.height * scale - 1;
-      return `<rect x="${x}" y="${y}" width="${iw}" height="${ih}" fill="#fff" stroke="#dbe0e5"/><text x="${x + iw / 2}" y="${y + ih / 2 + 4}" font-size="10" text-anchor="middle" fill="#5c6670">${i + 1}</text>`;
+      const iw = Math.max(0.2, it.width * scale - 1);
+      const ih = Math.max(0.2, it.height * scale - 1);
+      return `<rect x="${x}" y="${y}" width="${iw}" height="${ih}" fill="#fff" stroke="#dbe0e5"/>${c.ups <= 100 ? `<text x="${x + iw / 2}" y="${y + ih / 2 + 4}" font-size="10" text-anchor="middle" fill="#5c6670">${i + 1}</text>` : ''}`;
     })
     .join('');
   const grip = margins.top ? `<line x1="0" y1="${margins.top * scale}" x2="${w}" y2="${margins.top * scale}" stroke="#5c6670" stroke-dasharray="3 2"/>` : '';
@@ -49,12 +49,12 @@ export function cardHtml(name: string, inputs: CalcInputs, c: Calculation, when 
     ['Format netto', `${inputs.width} × ${inputs.height} mm (${c.formatName})`],
     [`Ze spadami ${inputs.bleed} mm`, `${c.itemWithBleed.width} × ${c.itemWithBleed.height} mm`],
     ['Arkusz · marginesy', `${c.sheet.name} ${c.sheet.size.width} × ${c.sheet.size.height} · ${c.sheet.marginTop} / ${c.sheet.marginSides} mm`],
-    ['Układ na arkuszu', `${c.ups}${c.imposition.best ? ` · ${c.imposition.best.columns} × ${c.imposition.best.rows}` : ''}`],
-    ['Wykorzystanie arkusza · ostatni arkusz', `${c.utilization} % · ${c.lastSheetPercent} %`],
+    ['Użytki na arkuszu', `${c.ups} szt. · ${strategyLabel(c)}`],
+    ['Ostatni arkusz nakładu', `${c.lastSheetUps} z ${c.ups} szt.`],
+    ['Wykorzystanie pola zadruku', `${c.utilization} %`],
     ...(c.wasteSheets ? ([[`Naddatek (${inputs.wastePercent} %)`, `${fmtInt(c.sheets)} + ${fmtInt(c.wasteSheets)} = ${fmtInt(c.grossSheets)} ark.`]] as [string, string][]) : []),
     [`Waga arkuszy (${fmtInt(c.grossSheets)} × ${fmtDec(c.sheetWeightG, 1)} g)`, `${fmtDec(c.totalWeightKg, 1)} kg`],
     ...(c.cost != null ? ([['Koszt papieru', `${fmtDec(c.cost, 2)} zł`]] as [string, string][]) : []),
-    ['Waga 1 szt. / nakładu', `${fmtDec(c.pieceWeightG, 1)} g / ${fmtDec(c.runWeightKg, 1)} kg`],
     ['Data', fmtDate(when)],
   ];
   return `<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>${esc(name || 'Karta zlecenia')}</title>
@@ -62,16 +62,39 @@ export function cardHtml(name: string, inputs: CalcInputs, c: Calculation, when 
 <h1>${esc(name || `Obliczenie ${c.formatName}`)}</h1><div class="sub">Karta zlecenia · kalkulator poligraficzny</div>
 <div class="top">${previewSvg(c)}<div><div class="lbl">Arkuszy ${esc(c.sheet.name)}</div><div class="big">${fmtInt(c.grossSheets)}</div>
 <div class="stat"><div class="lbl">Nakład</div><b>${fmtInt(inputs.quantity)} szt.</b></div>
-<div class="stat"><div class="lbl">Ostatni arkusz</div><b>${c.lastSheetPercent} %</b></div>
+<div class="stat"><div class="lbl">Użytki na arkuszu</div><b>${c.ups} szt.</b></div>
 <div class="stat"><div class="lbl">Papier</div><b>${inputs.grammage} g/m² · ${fmtDec(c.totalWeightKg, 1)} kg</b></div></div></div>
 <div class="kv">${rows.map(([k, v]) => `<div class="lbl">${esc(k)}</div><div>${esc(v)}</div>`).join('')}</div>
 </body></html>`;
 }
 
-export async function exportCardPdf(name: string, inputs: CalcInputs, c: Calculation): Promise<void> {
-  const html = cardHtml(name, inputs, c);
+export async function exportCardPdf(name: string, inputs: CalcInputs, c: Calculation, when?: number): Promise<void> {
+  const html = cardHtml(name, inputs, c, when);
   if (Platform.OS === 'web') {
-    await Print.printAsync({ html });
+    const frame = document.createElement('iframe');
+    frame.title = 'Podgląd wydruku karty zlecenia';
+    frame.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
+    await new Promise<void>((resolve, reject) => {
+      frame.onload = () => {
+        const win = frame.contentWindow;
+        if (!win || typeof win.print !== 'function') {
+          frame.remove();
+          reject(new Error('Drukowanie niedostępne'));
+          return;
+        }
+        win.addEventListener('afterprint', () => frame.remove(), { once: true });
+        try {
+          win.focus();
+          win.print();
+          resolve();
+        } catch (error) {
+          frame.remove();
+          reject(error);
+        }
+      };
+      frame.srcdoc = html;
+      document.body.appendChild(frame);
+    });
     return;
   }
   const { uri } = await Print.printToFileAsync({ html });
@@ -80,22 +103,28 @@ export async function exportCardPdf(name: string, inputs: CalcInputs, c: Calcula
   }
 }
 
-export async function shareCard(name: string, inputs: CalcInputs, c: Calculation): Promise<void> {
-  const text = cardText(name, inputs, c);
+export async function shareCard(name: string, inputs: CalcInputs, c: Calculation, when?: number): Promise<'shared' | 'copied'> {
+  const text = cardText(name, inputs, c, when);
   if (Platform.OS === 'web') {
     const nav = globalThis.navigator as Navigator & { share?: (d: { text: string; title?: string }) => Promise<void>; clipboard?: { writeText(s: string): Promise<void> } };
-    if (nav.share) await nav.share({ title: name || 'Karta zlecenia', text });
-    else await nav.clipboard?.writeText(text);
-    return;
+    if (nav.share) {
+      await nav.share({ title: name || 'Karta zlecenia', text });
+      return 'shared';
+    }
+    if (!nav.clipboard) throw new Error('Schowek niedostępny');
+    await nav.clipboard.writeText(text);
+    return 'copied';
   }
   await Share.share({ message: text, title: name || 'Karta zlecenia' });
+  return 'shared';
 }
 
 export function historyCsv(entries: HistoryEntry[]): string {
   const head = ['data', 'nazwa', 'format', 'szerokosc_mm', 'wysokosc_mm', 'spad_mm', 'naklad', 'arkusz', 'uzytkow_na_arkuszu', 'arkuszy', 'gramatura', 'waga_kg', 'koszt_pln', 'zapisane'];
   const cell = (v: string | number | boolean) => {
-    const s = String(v);
-    return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    let s = String(v);
+    if (typeof v === 'string' && (/^\s*[=+@-]/.test(s) || /^[\t\r\n]/.test(s))) s = "'" + s;
+    return /[";\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const lines = entries.map((e) =>
     [

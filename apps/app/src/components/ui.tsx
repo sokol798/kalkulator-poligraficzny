@@ -4,6 +4,7 @@
  */
 import { router } from 'expo-router';
 import type { PropsWithChildren, ReactNode } from 'react';
+import { Link } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text as RNText, View, type PressableProps, type StyleProp, type TextProps, type TextStyle, type ViewProps, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -271,8 +272,9 @@ export function Hairline() {
 export function Footer() {
   return (
     <View style={styles.footer}>
+      <Link href="/information"><Text variant="label">Prywatność i zasady korzystania</Text></Link>
       <Text variant="small" color="muted" style={{ textAlign: 'center' }}>
-        {`© ${new Date().getFullYear()} ${t.footer.owner} ®`}
+        {`© ${new Date().getFullYear()} ${t.footer.owner}`}
       </Text>
     </View>
   );

@@ -114,3 +114,24 @@ describe('calculateImposition – układ mieszany', () => {
     }
   });
 });
+
+describe('limity podglądu', () => {
+  it('zachowuje liczbę użytków bez tworzenia geometrii', () => {
+    const input = base({ sheet: { width: 10000, height: 10000 }, item: { width: 1, height: 1 }, forceOrientation: 'portrait' });
+    const result = calculateImposition(input, 400);
+    expect(result.best?.ups).toBe(100_000_000);
+    expect(result.best?.items).toEqual([]);
+    expect(result.best?.usedArea).toEqual(input.sheet);
+  });
+
+  it('pomija obliczenie dla wymiarów spoza dozwolonego zakresu', () => {
+    expect(calculateImposition(base({ item: { width: 0.001, height: 1 } }), 400).best).toBeNull();
+  });
+
+  it('wybiera ten sam wariant w trybie porównania i podglądu', () => {
+    const input = base({ gutter: 2, bleed: 3 });
+    const preview = calculateImposition(input, 400);
+    const comparison = calculateImposition(input, 0);
+    expect(comparison.best).toEqual({ ...preview.best, items: [] });
+  });
+});

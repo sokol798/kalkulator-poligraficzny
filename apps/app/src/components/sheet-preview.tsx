@@ -4,6 +4,7 @@
  */
 import type { ImpositionResult } from '@printcalc/core';
 import { Pressable, type StyleProp, type ViewStyle } from 'react-native';
+import { Text } from '@/components/ui';
 import Svg, { Line, Rect, Text as SvgText } from 'react-native-svg';
 
 import { radius } from '@/theme/tokens';
@@ -23,6 +24,7 @@ export function SheetPreview({ result, maxWidth, maxHeight, numbered, onPress, a
   const theme = useTheme();
   const { sheet, margins } = result.input;
   const layout = result.best;
+  if (layout && !layout.items.length) return <Text variant="label">Podgląd pominięto ze względu na liczbę użytków.</Text>;
   if (sheet.width <= 0 || sheet.height <= 0) return null;
   const scale = Math.min(maxWidth / sheet.width, maxHeight / sheet.height);
   const w = sheet.width * scale;
@@ -45,7 +47,7 @@ export function SheetPreview({ result, maxWidth, maxHeight, numbered, onPress, a
           <Rect key={`r${i}`} x={x} y={y} width={iw} height={ih} rx={1} fill={it.orientation === 'portrait' ? theme.previewItem : theme.previewItemAlt} />
         );
       })}
-      {numbered
+      {numbered && (layout?.ups ?? 0) <= 100
         ? layout?.items.map((it, i) => (
             <SvgText
               key={`t${i}`}
