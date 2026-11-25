@@ -27,7 +27,7 @@ jobs:
         working-directory: apps/app
         env:
           EXPO_NO_TELEMETRY: '1'
-      - run: cp apps/app/dist/index.html apps/app/dist/404.html && touch apps/app/dist/.nojekyll
+      - run: node scripts/prepare-pages.mjs
       # Publikacja do gałęzi gh-pages, z której serwowane jest GitHub Pages tego repozytorium.
       - uses: peaceiris/actions-gh-pages@v4
         with:

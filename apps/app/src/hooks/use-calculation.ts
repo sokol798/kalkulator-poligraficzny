@@ -55,9 +55,7 @@ export function buildImpositionInput(inputs: CalcInputs, sheet: ResolvedSheet): 
     bleed: inputs.bleed,
     gutter: 0,
     margins: { top: sheet.marginTop, right: sheet.marginSides, bottom: sheet.marginSides, left: sheet.marginSides },
-    // Wpisy zapisane przez starszą wersję mogą korzystać z układu mieszanego.
-    allowMixed: !inputs.orientation,
-    forceOrientation: inputs.orientation,
+    allowMixed: true,
   };
 }
 

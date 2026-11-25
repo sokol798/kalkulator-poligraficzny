@@ -60,7 +60,6 @@ export interface CalcInputs {
   height: number;
   /** Id formatu (wbudowanego lub własnego), gdy wymiar pochodzi z listy. */
   formatId: string | null;
-  orientation?: 'portrait' | 'landscape';
   bleed: number;
   quantity: number;
   sheetId: string;
@@ -123,7 +122,6 @@ function inputsFromSettings(s: Settings): CalcInputs {
     width: 148,
     height: 210,
     formatId: 'f-a5',
-    orientation: 'portrait',
     bleed: s.bleed,
     quantity: 1000,
     sheetId: s.defaultSheetId,
@@ -217,7 +215,6 @@ export const useAppStore = create<AppState>()(
           };
           if (st.inputs && !wasteEnabled) st.inputs = { ...st.inputs, wastePercent: 0 };
         }
-        if (version < 7 && st.inputs && !st.currentEntryId) st.inputs = { ...st.inputs, orientation: st.inputs.orientation ?? 'portrait' };
         return st as AppState;
       },
       storage: createJSONStorage(() => AsyncStorage),

@@ -28,7 +28,6 @@ export function CalculatorScreen() {
   const currentEntryId = useAppStore((s) => s.currentEntryId);
   const starred = useAppStore((s) => (s.currentEntryId ? s.history.find((h) => h.id === s.currentEntryId)?.starred : false)) ?? false;
   const calc = useCalculation();
-  const [printOptionsOpen, setPrintOptionsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [computed, setComputed] = useState(false);
   const firstRender = useRef(true);
@@ -44,9 +43,7 @@ export function CalculatorScreen() {
 
   const compute = () => {
     setComputed(true);
-    if (!calc.ups) return;
-    if (settings.autoSave) saveCurrent(summaryOf(calc, settings));
-    router.push('/card');
+    if (settings.autoSave && calc.ups > 0) saveCurrent(summaryOf(calc, settings));
   };
 
   const quickFormats = QUICK_FORMAT_IDS.map((id) => findFormat(id, myFormats)!).filter(Boolean);
@@ -120,75 +117,62 @@ export function CalculatorScreen() {
         <ValueTile label={t.calc.sheet} value={calc.sheet.name} sub={unit.fmtSize(calc.sheet.size.width, calc.sheet.size.height)} onPress={() => router.push('/pick-sheet')} accessibilityLabel={t.pickSheet.title} />
       </View>
 
-      <PillButton kind="secondary" title={printOptionsOpen ? 'Zwiń parametry druku' : 'Parametry druku'} onPress={() => setPrintOptionsOpen(!printOptionsOpen)} />
-      {printOptionsOpen ? (
-        <>
-          {/* Cena za arkusz | Naddatek – kafelki */}
-          <View style={styles.twoCol}>
-            <ValueTile
-              label={t.calc.priceCard}
-              value={inputs.pricePerSheet > 0 ? fmtDec(inputs.pricePerSheet, 2) : '—'}
-              unit={inputs.pricePerSheet > 0 ? t.settings.pln : undefined}
-              muted={!(inputs.pricePerSheet > 0)}
-              sub={inputs.pricePerSheet > 0 ? undefined : t.calc.priceHint}
-              onPress={() => router.push('/edit-price')}
-              accessibilityLabel={t.calc.editPrice}
-            />
-            <ValueTile
-              label={t.calc.wasteCard}
-              value={inputs.wastePercent > 0 ? String(inputs.wastePercent).replace('.', ',') : '—'}
-              unit={inputs.wastePercent > 0 ? '%' : undefined}
-              muted={!(inputs.wastePercent > 0)}
-              sub={inputs.wastePercent > 0 ? undefined : t.calc.wasteHint}
-              onPress={() => router.push('/edit-waste')}
-              accessibilityLabel={t.calc.editWaste}
-            />
+      {/* Cena za arkusz | Naddatek – kafelki */}
+      <View style={styles.twoCol}>
+        <ValueTile
+          label={t.calc.priceCard}
+          value={inputs.pricePerSheet > 0 ? fmtDec(inputs.pricePerSheet, 2) : '—'}
+          unit={inputs.pricePerSheet > 0 ? t.settings.pln : undefined}
+          muted={!(inputs.pricePerSheet > 0)}
+          sub={inputs.pricePerSheet > 0 ? undefined : t.calc.priceHint}
+          onPress={() => router.push('/edit-price')}
+          accessibilityLabel={t.calc.editPrice}
+        />
+        <ValueTile
+          label={t.calc.wasteCard}
+          value={inputs.wastePercent > 0 ? String(inputs.wastePercent).replace('.', ',') : '—'}
+          unit={inputs.wastePercent > 0 ? '%' : undefined}
+          muted={!(inputs.wastePercent > 0)}
+          sub={inputs.wastePercent > 0 ? undefined : t.calc.wasteHint}
+          onPress={() => router.push('/edit-waste')}
+          accessibilityLabel={t.calc.editWaste}
+        />
+      </View>
+
+      {/* Papier */}
+      <Card>
+        <Label>{t.calc.paper}</Label>
+        <View style={styles.chips}>
+          {QUICK_GRAMMAGES.map((g) => (
+            <Chip key={g} label={String(g)} on={inputs.grammage === g} onPress={() => setInput('grammage', g)} />
+          ))}
+          {customGrammage ? <Chip label={String(inputs.grammage)} on style={{ marginLeft: 'auto' }} /> : null}
+          {otherField({ value: inputs.grammage, isCustom: false, onChange: (v) => setInput('grammage', v), decimals: 0, max: 1000, label: t.calc.paper, width: 72 })}
+        </View>
+      </Card>
+
+      {/* Spady | Marginesy */}
+      <View style={styles.twoCol}>
+        <Card style={styles.col}>
+          <Label>{t.calc.bleed}</Label>
+          <View style={styles.chips}>
+            {BLEED_OPTIONS.map((b) => (
+              <Chip key={b} small label={unit.fmt(b)} on={inputs.bleed === b} onPress={() => setInput('bleed', b)} />
+            ))}
+            {otherField({ value: unit.toDisplay(inputs.bleed), isCustom: customBleed, onChange: (v) => setInput('bleed', unit.fromDisplay(v)), decimals: unit.digits, max: unit.toDisplay(50), label: t.calc.bleed })}
           </View>
-
-          {/* Papier */}
-          <Card>
-            <Label>{t.calc.paper}</Label>
-            <View style={styles.chips}>
-              {QUICK_GRAMMAGES.map((g) => (
-                <Chip key={g} label={String(g)} on={inputs.grammage === g} onPress={() => setInput('grammage', g)} />
-              ))}
-              {customGrammage ? <Chip label={String(inputs.grammage)} on style={{ marginLeft: 'auto' }} /> : null}
-              {otherField({ value: inputs.grammage, isCustom: false, onChange: (v) => setInput('grammage', v), decimals: 0, max: 1000, label: t.calc.paper, width: 72 })}
-            </View>
-          </Card>
-
-          {/* Spady | Marginesy */}
-          <View style={styles.twoCol}>
-            <Card style={styles.col}>
-              <Label>{t.calc.bleed}</Label>
-              <View style={styles.chips}>
-                {BLEED_OPTIONS.map((b) => (
-                  <Chip key={b} small label={unit.fmt(b)} on={inputs.bleed === b} onPress={() => setInput('bleed', b)} />
-                ))}
-                {otherField({ value: unit.toDisplay(inputs.bleed), isCustom: customBleed, onChange: (v) => setInput('bleed', unit.fromDisplay(v)), decimals: unit.digits, max: unit.toDisplay(50), label: t.calc.bleed })}
-              </View>
-            </Card>
-            <Card style={styles.col}>
-              <Label>{t.calc.margins}</Label>
-              <View style={styles.chips}>
-                {MARGIN_TOP_OPTIONS.map((m) => (
-                  <Chip key={m} small label={unit.fmt(m)} on={marginTop === m} onPress={() => setInput('marginTop', m)} />
-                ))}
-                {otherField({ value: unit.toDisplay(marginTop), isCustom: customMargin, onChange: (v) => setInput('marginTop', unit.fromDisplay(v)), decimals: unit.digits, max: unit.toDisplay(100), label: t.calc.margins })}
-              </View>
-              <Label style={{ fontSize: 11 }}>{t.calc.marginsSides(unit.fmtWithUnit(calc.sheet.marginSides))}</Label>
-            </Card>
+        </Card>
+        <Card style={styles.col}>
+          <Label>{t.calc.margins}</Label>
+          <View style={styles.chips}>
+            {MARGIN_TOP_OPTIONS.map((m) => (
+              <Chip key={m} small label={unit.fmt(m)} on={marginTop === m} onPress={() => setInput('marginTop', m)} />
+            ))}
+            {otherField({ value: unit.toDisplay(marginTop), isCustom: customMargin, onChange: (v) => setInput('marginTop', unit.fromDisplay(v)), decimals: unit.digits, max: unit.toDisplay(100), label: t.calc.margins })}
           </View>
-
-          <Card>
-            <Label>Orientacja użytku</Label>
-            <View style={styles.chips}>
-              <Chip label="Pion" on={inputs.orientation === 'portrait'} onPress={() => setInput('orientation', 'portrait')} />
-              <Chip label="Poziom" on={inputs.orientation === 'landscape'} onPress={() => setInput('orientation', 'landscape')} />
-            </View>
-          </Card>
-        </>
-      ) : null}
+          <Label style={{ fontSize: 11 }}>{t.calc.marginsSides(unit.fmtWithUnit(calc.sheet.marginSides))}</Label>
+        </Card>
+      </View>
 
       {/* Wynik – po kliknięciu „Oblicz” */}
       {computed ? (
@@ -205,7 +189,7 @@ export function CalculatorScreen() {
                     {t.calc.sheetsOf(calc.sheet.name)} <Label>{t.calc.perSheet(calc.ups, calc.utilization)}</Label>
                   </Text>
                   <Text variant="body">
-                    {t.calc.paperWeight(fmtDec(calc.totalWeightKg, 1))}
+                    {t.calc.paperWeight(fmtDec(calc.totalWeightKg, 1))} <Label>{t.calc.perPiece(fmtDec(calc.pieceWeightG, 1), fmtDec(calc.runWeightKg, 1))}</Label>
                   </Text>
                   {calc.wasteSheets > 0 || calc.cost != null ? (
                     <Text variant="body">
@@ -229,7 +213,7 @@ export function CalculatorScreen() {
         {computed ? (
           <>
             <PillButton title={t.calc.card} onPress={() => router.push('/card')} icon={<ChevronRight color={theme.onInk} />} style={{ flex: 1 }} disabled={!calc.ups} />
-            <IconButton accessibilityLabel={starred ? t.calc.saved : t.calc.save} onPress={onSave} bordered size={50}>
+            <IconButton accessibilityLabel={starred ? t.calc.saved : t.calc.save} onPress={calc.ups ? onSave : undefined} bordered size={50}>
               <BookmarkIcon color={theme.ink} filled={starred} />
             </IconButton>
           </>
@@ -249,6 +233,11 @@ export function CalculatorScreen() {
       ) : null}
     </Screen>
   );
+}
+
+/** Opis układu najlepszego wariantu (do karty zlecenia). */
+export function layoutLabel(strategy: 'grid-portrait' | 'grid-landscape' | 'mixed'): string {
+  return strategy === 'mixed' ? t.calc.layoutMixed : strategy === 'grid-portrait' ? t.calc.layoutPortrait : t.calc.layoutLandscape;
 }
 
 const styles = StyleSheet.create({
